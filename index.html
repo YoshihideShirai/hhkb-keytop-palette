@@ -36,10 +36,16 @@
               <span class="step">01</span>
               <h2>キーボード</h2>
             </div>
-            <p><span class="selected-swatch" id="selectedSwatch"></span><span id="selectionText">選択中: Sumi</span></p>
+            <div class="toolbar-options">
+              <div class="layout-switch" role="group" aria-label="キーボード配列">
+                <button class="layout-button active" type="button" data-layout="us" aria-pressed="true">英語配列</button>
+                <button class="layout-button" type="button" data-layout="jis" aria-pressed="false">日本語配列</button>
+              </div>
+              <p><span class="selected-swatch" id="selectedSwatch"></span><span id="selectionText">選択中: Sumi</span></p>
+            </div>
           </div>
           <div class="keyboard-stage">
-            <div class="keyboard" id="keyboard" aria-label="HHKB US配列"></div>
+            <div class="keyboard" id="keyboard" aria-label="HHKB 英語配列"></div>
           </div>
           <p class="hint"><span aria-hidden="true">↖</span> キーをクリック / タップして色を変更</p>
         </div>
