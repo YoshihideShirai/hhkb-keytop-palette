@@ -34,7 +34,7 @@ main { width: min(1180px, calc(100% - 40px)); margin: auto; }
 .canvas-toolbar { justify-content: space-between; }.canvas-toolbar > div { display: flex; align-items: center; gap: 12px; }
 .toolbar-options { display: flex; align-items: center; gap: 16px; }
 .layout-switch { display: flex; padding: 2px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper); }
-.layout-button { padding: 6px 9px; border: 0; border-radius: 2px; background: transparent; color: var(--muted); cursor: pointer; font-size: 9px; font-weight: 700; }
+.layout-button { min-height: 40px; padding: 8px 12px; border: 0; border-radius: 2px; background: transparent; color: var(--muted); cursor: pointer; touch-action: manipulation; font-size: 10px; font-weight: 700; }
 .layout-button.active { background: var(--ink); color: white; }
 .step { color: var(--accent); font: 700 11px Georgia, serif; }.workspace h2 { margin: 0; font-size: 14px; letter-spacing: .08em; }
 .canvas-toolbar p { margin: 0; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
@@ -68,7 +68,7 @@ footer { padding: 28px clamp(20px, 5vw, 72px); display: flex; justify-content: s
   .site-header { height: 70px; }.button-ghost { display: none; }.button { padding: 0 12px; }.brand-mark { width: 34px; height: 34px; }
   main { width: min(100% - 24px, 1180px); }.hero { padding: 48px 4px 36px; }.hero h1 { font-size: 45px; }.lead { font-size: 12px; }
   .canvas-card { padding: 20px 12px; }.canvas-toolbar { padding: 0 4px; }.canvas-toolbar p { max-width: 110px; }.keyboard-stage { min-height: 290px; margin: 0 -12px; padding: 30px 12px; }.keyboard { --unit: 38px; min-width: auto; padding: 12px; }.key { padding: 6px 5px; font-size: 7px; }.hint { font-size: 9px; }
-  .toolbar-options { align-items: flex-end; flex-direction: column; gap: 7px; }.layout-button { padding: 5px 7px; }.canvas-toolbar p { justify-content: flex-end; }
+  .toolbar-options { align-items: flex-end; flex-direction: column; gap: 7px; }.layout-button { min-height: 44px; padding: 8px 10px; }.canvas-toolbar p { justify-content: flex-end; }
   .controls-card { display: block; padding: 26px 20px; }.palette { grid-template-columns: repeat(4, 1fr); }.presets-heading { margin-top: 28px; }.color-dot { width: 46px; height: 46px; }
   .tips { padding: 72px 4px; }.tip-grid { grid-template-columns: 1fr; }.tip-grid article, .tip-grid article + article { padding: 24px 0; border-left: 0; border-bottom: 1px solid var(--line); }.tips h2 { margin-bottom: 24px; }
   footer { gap: 20px; }.toast { width: calc(100% - 32px); text-align: center; }

@@ -85,7 +85,12 @@ presets.forEach((preset) => {
 function defaultColors() { let i = 0; return currentRows().flat().map(([label]) => presets[0].make(i++, label)); }
 function save() {
   savedDesigns[currentLayout] = keyColors;
-  localStorage.setItem("hhkb-keytop-palette", JSON.stringify({ layout: currentLayout, designs: savedDesigns }));
+  try {
+    localStorage.setItem("hhkb-keytop-palette", JSON.stringify({ layout: currentLayout, designs: savedDesigns }));
+    return true;
+  } catch {
+    return false;
+  }
 }
 function toast(message) { const el = document.querySelector("#toast"); el.textContent = message; el.classList.add("show"); clearTimeout(toast.timer); toast.timer = setTimeout(() => el.classList.remove("show"), 2400); }
 
@@ -113,7 +118,9 @@ function selectLayout(layout) {
     const active = button.dataset.layout === currentLayout;
     button.classList.toggle("active", active); button.setAttribute("aria-pressed", active);
   });
-  save(); renderKeyboard(); toast(`${layouts[currentLayout].name}に切り替えました`);
+  renderKeyboard();
+  const persisted = save();
+  toast(persisted ? `${layouts[currentLayout].name}に切り替えました` : `${layouts[currentLayout].name}に切り替えました（保存は利用できません）`);
 }
 
 document.querySelectorAll(".layout-button").forEach((button) => button.addEventListener("click", () => selectLayout(button.dataset.layout)));
