@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f1e8" />
+    <meta name="description" content="HHKBのキートップ配色をブラウザで手軽にデザインできるツール" />
+    <title>HHKB Keytop Palette</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="HHKB Keytop Palette ホーム">
+        <span class="brand-mark" aria-hidden="true">H</span>
+        <span><strong>HHKB</strong><small>KEYTOP PALETTE</small></span>
+      </a>
+      <div class="header-actions">
+        <button id="resetButton" class="button button-ghost" type="button">リセット</button>
+        <button id="shareButton" class="button button-dark" type="button">
+          <span aria-hidden="true">↗</span> デザインを共有
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">YOUR KEYS, YOUR COLORS.</p>
+        <h1>指先から、<br /><em>自分らしく。</em></h1>
+        <p class="lead">色を選んで、キーをタップ。あなただけのHHKBをデザインしよう。</p>
+      </section>
+
+      <section class="workspace" aria-label="キートップデザイナー">
+        <div class="canvas-card">
+          <div class="canvas-toolbar">
+            <div>
+              <span class="step">01</span>
+              <h2>キーボード</h2>
+            </div>
+            <p><span class="selected-swatch" id="selectedSwatch"></span><span id="selectionText">選択中: Sumi</span></p>
+          </div>
+          <div class="keyboard-stage">
+            <div class="keyboard" id="keyboard" aria-label="HHKB US配列"></div>
+          </div>
+          <p class="hint"><span aria-hidden="true">↖</span> キーをクリック / タップして色を変更</p>
+        </div>
+
+        <aside class="controls-card">
+          <div class="section-title">
+            <span class="step">02</span>
+            <h2>カラー</h2>
+          </div>
+          <div id="palette" class="palette" role="radiogroup" aria-label="キートップカラー"></div>
+
+          <label class="custom-color">
+            <span>カスタムカラー</span>
+            <span class="color-input-wrap">
+              <input id="customColor" type="color" value="#e45d45" aria-label="カスタムカラーを選択" />
+              <output id="customColorValue">#E45D45</output>
+            </span>
+          </label>
+
+          <div class="presets-heading">
+            <div><span class="step">03</span><h2>プリセット</h2></div>
+            <span>ワンタップで適用</span>
+          </div>
+          <div id="presets" class="presets"></div>
+        </aside>
+      </section>
+
+      <section class="tips">
+        <p class="eyebrow">DESIGN TIPS</p>
+        <h2>迷ったときの、配色ヒント。</h2>
+        <div class="tip-grid">
+          <article><span>01</span><h3>アクセントは少なめに</h3><p>EscやEnterなど、2〜3個のキーに絞ると全体がまとまります。</p></article>
+          <article><span>02</span><h3>役割ごとに色分け</h3><p>修飾キーと文字キーで色を分けると、見やすく機能的なデザインに。</p></article>
+          <article><span>03</span><h3>共有して比べよう</h3><p>作った配色はURLでそのまま共有。スマホでもPCでも確認できます。</p></article>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <footer><p>HHKB KEYTOP PALETTE</p><p>非公式の配色シミュレーターです。</p></footer>
+    <script src="app.js"></script>
+  </body>
+</html>
