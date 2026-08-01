@@ -46,9 +46,12 @@ main { width: min(1320px, calc(100% - 40px)); margin: auto; }
 .keyboard-studio { --unit: clamp(32px, 3.95vw, 50px); padding: 26px 22px 28px; border-radius: 8px; }
 .keyboard-studio::before, .keyboard-studio::after { content: ""; position: absolute; left: 15px; right: 15px; height: 5px; border-radius: 999px; background: rgba(0,0,0,.18); }
 .keyboard-studio::before { top: 11px; }.keyboard-studio::after { bottom: 11px; }
-.key-row { position: relative; z-index: 1; display: flex; justify-content: center; gap: 5px; margin-bottom: 5px; }.key-row:last-child { margin-bottom: 0; }
+.key-row { position: relative; z-index: 1; display: flex; justify-content: flex-start; gap: 5px; margin-bottom: 5px; }.key-row:last-child { margin-bottom: 0; }
 .key { position: relative; z-index: 1; width: calc(var(--unit) * var(--w, 1)); height: var(--unit); flex: 0 0 auto; display: flex; align-items: flex-start; justify-content: flex-start; padding: 8px 7px; border: 0; border-radius: 4px; background: var(--key-color); color: var(--legend-color); box-shadow: inset 0 -3px 0 rgba(0,0,0,.18), 0 2px 2px rgba(0,0,0,.18); font-size: clamp(7px, .75vw, 10px); font-weight: 650; white-space: pre-line; line-height: 1.2; cursor: pointer; transition: transform .1s, background .2s; }
 .legend-center .key { align-items: center; justify-content: center; text-align: center; padding: 7px; }
+.key.spacer { padding: 0; background: transparent; box-shadow: none; visibility: hidden; pointer-events: none; }
+.key.jis-enter { z-index: 3; height: calc(var(--unit) * 2 + 5px); margin-bottom: calc(-1 * (var(--unit) + 5px)); align-items: flex-start; justify-content: flex-end; padding: 8px 7px; clip-path: polygon(0 0, 100% 0, 100% 100%, 17% 100%, 17% 50%, 0 50%); }
+.key.arrow { align-items: center; justify-content: center; padding: 7px; font-size: clamp(11px, 1vw, 14px); }
 .key:hover { transform: translateY(-2px); }.key:active { transform: translateY(1px); }.key.space { justify-content: center; }
 .pointing-stick { position: absolute; z-index: 2; top: calc(50% - 12px); left: calc(50% + var(--unit) * .15); width: 13px; height: 13px; border-radius: 50%; background: #3b4f82; box-shadow: inset 0 2px 0 rgba(255,255,255,.22), 0 1px 3px rgba(0,0,0,.34); pointer-events: none; }
 .hint { margin: 0; text-align: center; color: #949087; font-size: 10px; letter-spacing: .05em; }
@@ -87,7 +90,7 @@ footer { padding: 28px clamp(20px, 5vw, 72px); display: flex; justify-content: s
 @media (max-width: 600px) {
   .site-header { height: 70px; }.button-ghost { display: none; }.button { padding: 0 12px; }.brand-mark { width: 34px; height: 34px; }
   main { width: min(100% - 24px, 1180px); }.hero { padding: 40px 4px 30px; }.hero h1 { font-size: 45px; }.lead { font-size: 12px; }
-  .canvas-card { padding: 20px 12px; }.canvas-toolbar { padding: 0 4px; }.canvas-toolbar p { max-width: 110px; }.keyboard-stage { min-height: 290px; margin: 0 -12px; padding: 30px 12px; }.keyboard { --unit: 38px; min-width: auto; padding: 12px; }.key { padding: 6px 5px; font-size: 7px; }.hint { font-size: 9px; }
+  .canvas-card { padding: 20px 12px; }.canvas-toolbar { padding: 0 4px; }.canvas-toolbar p { max-width: 110px; }.keyboard-stage { min-height: 290px; margin: 0 -12px; padding: 30px 12px; }.keyboard { --unit: 38px; min-width: auto; padding: 12px; }.key { padding: 6px 5px; font-size: 7px; }.key.jis-enter { padding: 6px 5px; }.hint { font-size: 9px; }
   .toolbar-options { align-items: flex-end; flex-direction: column; gap: 7px; }.layout-button { min-height: 44px; padding: 8px 10px; }.canvas-toolbar p { justify-content: flex-end; }
   .controls-card { display: block; padding: 26px 20px; }.model-series { grid-template-columns: 1fr; margin-bottom: 24px; }.layout-options, .body-colors { margin-bottom: 24px; }.model-title, .layout-title, .body-color-title, .color-title { margin-bottom: 12px; }.palette { grid-template-columns: repeat(4, 1fr); }.presets-heading { margin-top: 28px; }.color-dot { width: 46px; height: 46px; }
   .tips { padding: 72px 4px; }.tip-grid { grid-template-columns: 1fr; }.tip-grid article, .tip-grid article + article { padding: 24px 0; border-left: 0; border-bottom: 1px solid var(--line); }.tips h2 { margin-bottom: 24px; }
