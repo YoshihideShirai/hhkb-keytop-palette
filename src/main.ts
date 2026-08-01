@@ -29,7 +29,16 @@ interface Preset {
   name: string;
   sub: string;
   colors: string[];
-  make: (index: number, label: string) => string;
+  make: (key: KeyContext) => string;
+}
+
+interface KeyContext {
+  index: number;
+  rowIndex: number;
+  columnIndex: number;
+  rowLength: number;
+  label: string;
+  className: string;
 }
 
 interface ProductAppearance {
@@ -64,6 +73,18 @@ const colors: ColorOption[] = [
   { name: "灰", value: "#8b8b84" },
 ];
 
+const keytop = {
+  sumi: "#3b3b38",
+  white: "#e7e3d8",
+  whiteSpecial: "#b7b3a8",
+  snow: "#f8f7f2",
+  sakura: "#f1c6c9",
+  wasabi: "#b8c58a",
+  tanpopo: "#f0c94b",
+  fuji: "#c8b2d8",
+  sora: "#a9d2e8",
+};
+
 const layouts: Record<LayoutName, Layout> = {
   us: {
     name: "英語配列",
@@ -89,22 +110,103 @@ const layouts: Record<LayoutName, Layout> = {
 
 const presets: Preset[] = [
   {
-    name: "定番",
-    sub: "白・墨・雪",
-    colors: ["#e7e3d8", "#b7b3a8", "#3b3b38", "#f8f7f2"],
-    make: (_, label) => label === "Esc" ? "#f8f7f2" : (/[A-Z]/.test(label) && label.length === 1 ? "#e7e3d8" : "#b7b3a8"),
+    name: "中央印字 墨",
+    sub: "ミニマムな墨",
+    colors: [keytop.sumi],
+    make: () => keytop.sumi,
   },
   {
-    name: "花暦",
-    sub: "桜・山葵・蒲公英",
-    colors: ["#f1c6c9", "#b8c58a", "#f0c94b"],
-    make: (i, label) => label === "Esc" || label === "Return" ? "#b8c58a" : (i % 7 === 0 ? "#f1c6c9" : "#f0c94b"),
+    name: "中央印字 白",
+    sub: "白 + 特殊キー",
+    colors: [keytop.white, keytop.whiteSpecial],
+    make: ({ label, className }) => isWhiteProductSpecialKey(label, className) ? keytop.whiteSpecial : keytop.white,
   },
   {
-    name: "静寂",
-    sub: "墨・灰・空",
-    colors: ["#3b3b38", "#8b8b84", "#a9d2e8"],
-    make: (_, label) => label === "Esc" ? "#a9d2e8" : (["Control", "Shift", "Fn", "Alt", "◇"].includes(label) ? "#8b8b84" : "#3b3b38"),
+    name: "桜アクセント",
+    sub: "Esc / Control",
+    colors: [keytop.sumi, keytop.sakura],
+    make: ({ label }) => ["Esc", "Control"].includes(normalizeLabel(label)) ? keytop.sakura : keytop.sumi,
+  },
+  {
+    name: "山葵アクセント",
+    sub: "桜と花見団子",
+    colors: [keytop.white, keytop.sakura, keytop.wasabi, keytop.tanpopo],
+    make: ({ label, columnIndex }) => {
+      const normalized = normalizeLabel(label);
+      if (["Esc", "Control"].includes(normalized)) return keytop.sakura;
+      if (["Return", "Enter", "BS", "Delete"].includes(normalized)) return keytop.wasabi;
+      if (columnIndex >= 5 && columnIndex <= 7) return keytop.tanpopo;
+      return keytop.white;
+    },
+  },
+  {
+    name: "蒲公英マーク",
+    sub: "若葉マーク風",
+    colors: [keytop.sumi, keytop.tanpopo, keytop.wasabi],
+    make: ({ rowIndex, columnIndex, rowLength }) => {
+      const center = (rowLength - 1) / 2;
+      const distance = Math.abs(columnIndex - center);
+      if ((rowIndex === 1 || rowIndex === 2) && distance <= 1.5) return keytop.wasabi;
+      if ((rowIndex === 2 || rowIndex === 3) && distance >= 2 && distance <= 4) return keytop.tanpopo;
+      return keytop.sumi;
+    },
+  },
+  {
+    name: "藤グラデーション",
+    sub: "数字キーに淡色",
+    colors: [keytop.white, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
+    make: ({ label, columnIndex }) => {
+      if (!isNumberKey(label)) return keytop.white;
+      const gradient = [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora];
+      return gradient[columnIndex % gradient.length];
+    },
+  },
+  {
+    name: "空カーソル",
+    sub: "矢印 / Fn / 数字",
+    colors: [keytop.sumi, keytop.sora],
+    make: ({ label, className }) => isMarkerKey(label, className) ? keytop.sora : keytop.sumi,
+  },
+  {
+    name: "Happy Hacking",
+    sub: "好きな言葉を表現",
+    colors: [keytop.white, keytop.sakura],
+    make: ({ label }) => {
+      const normalized = normalizeLabel(label);
+      return normalized && "HAPPYCKING".includes(normalized) ? keytop.sakura : keytop.white;
+    },
+  },
+  {
+    name: "ボーダー",
+    sub: "段ごとに色分け",
+    colors: [keytop.sumi, keytop.wasabi],
+    make: ({ rowIndex }) => rowIndex === 1 || rowIndex === 3 ? keytop.wasabi : keytop.sumi,
+  },
+  {
+    name: "縦グラデーション",
+    sub: "縦方向に配置",
+    colors: [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
+    make: ({ rowIndex, columnIndex }) => {
+      const gradient = [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora];
+      return Math.abs(columnIndex - 7) <= 1 ? gradient[rowIndex] : keytop.white;
+    },
+  },
+  {
+    name: "ハート",
+    sub: "記事のベスポジ",
+    colors: [keytop.white, keytop.sakura],
+    make: ({ rowIndex, label }) => isHeartKey(rowIndex, label) ? keytop.sakura : keytop.white,
+  },
+  {
+    name: "Esc / Control",
+    sub: "周辺アイテムと色合わせ",
+    colors: [keytop.snow, keytop.sora, keytop.fuji],
+    make: ({ label }) => {
+      const normalized = normalizeLabel(label);
+      if (normalized === "Esc") return keytop.sora;
+      if (normalized === "Control") return keytop.fuji;
+      return keytop.snow;
+    },
   },
 ];
 
@@ -174,12 +276,51 @@ function currentRows(): KeyDefinition[][] {
   return layouts[currentLayout].rows;
 }
 
+function currentKeyContexts(): KeyContext[] {
+  let index = 0;
+  return currentRows().flatMap((row, rowIndex) =>
+    row.map(([label, , className = ""], columnIndex) => ({
+      index: index++,
+      rowIndex,
+      columnIndex,
+      rowLength: row.length,
+      label,
+      className,
+    }))
+  );
+}
+
+function normalizeLabel(label: string): string {
+  return label.split("\n")[0];
+}
+
+function isNumberKey(label: string): boolean {
+  return /^\d/.test(normalizeLabel(label));
+}
+
+function isMarkerKey(label: string, className: string): boolean {
+  const normalized = normalizeLabel(label);
+  return className === "arrow" || normalized === "Fn" || isNumberKey(label);
+}
+
+function isHeartKey(rowIndex: number, label: string): boolean {
+  const normalized = normalizeLabel(label);
+  const heartRows = [
+    ["7", "8", "0", "-"],
+    ["Y", "U", "I", "O", "P", "@", "["],
+    ["H", "J", "K", "L", ";"],
+    ["M", ",", "."],
+    ["かな"],
+  ];
+  return heartRows[rowIndex]?.includes(normalized) ?? false;
+}
+
 function isWhiteProduct(product: ProductAppearance): boolean {
   return product.colorName === "白";
 }
 
 function isWhiteProductSpecialKey(label: string, className: string): boolean {
-  const normalized = label.split("\n")[0];
+  const normalized = normalizeLabel(label);
   return className === "space" || [
     "Esc",
     "Tab",
@@ -291,8 +432,7 @@ presets.forEach((preset) => {
   button.className = "preset";
   button.innerHTML = `<span><strong>${preset.name}</strong><small>${preset.sub}</small></span><span class="preset-colors">${preset.colors.map((color) => `<i style="--color:${color}"></i>`).join("")}</span>`;
   button.addEventListener("click", () => {
-    let i = 0;
-    keyColors = currentRows().flat().map(([label]) => preset.make(i++, label));
+    keyColors = currentKeyContexts().map((key) => preset.make(key));
     save();
     renderKeyboard();
     toast(`${preset.name} を適用しました`);
