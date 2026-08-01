@@ -17,7 +17,7 @@ type ProductId =
 
 interface ColorOption {
   name: string;
-  value: string;
+  value: ColorDefinition;
 }
 
 interface Layout {
@@ -28,8 +28,8 @@ interface Layout {
 interface Preset {
   name: string;
   sub: string;
-  colors: string[];
-  make: (key: KeyContext) => string;
+  colors: ColorDefinition[];
+  make: (key: KeyContext) => ColorDefinition;
 }
 
 interface KeyContext {
@@ -60,7 +60,11 @@ interface SavedState {
   product?: string;
 }
 
+const bodyColor = "__body_color__" as const;
+type ColorDefinition = string | typeof bodyColor;
+
 const colors: ColorOption[] = [
+  { name: "本体カラー", value: bodyColor },
   { name: "墨", value: "#3b3b38" },
   { name: "白", value: "#e7e3d8" },
   { name: "白 特殊キー", value: "#b7b3a8" },
@@ -124,39 +128,39 @@ const presets: Preset[] = [
   {
     name: "桜アクセント",
     sub: "Esc / Control",
-    colors: [keytop.sumi, keytop.sakura],
-    make: ({ label }) => ["Esc", "Control"].includes(normalizeLabel(label)) ? keytop.sakura : keytop.sumi,
+    colors: [bodyColor, keytop.sakura],
+    make: ({ label }) => ["Esc", "Control"].includes(normalizeLabel(label)) ? keytop.sakura : bodyColor,
   },
   {
     name: "山葵アクセント",
     sub: "桜と花見団子",
-    colors: [keytop.white, keytop.sakura, keytop.wasabi, keytop.tanpopo],
+    colors: [bodyColor, keytop.sakura, keytop.wasabi, keytop.tanpopo],
     make: ({ label, columnIndex }) => {
       const normalized = normalizeLabel(label);
       if (["Esc", "Control"].includes(normalized)) return keytop.sakura;
       if (["Return", "Enter", "BS", "Delete"].includes(normalized)) return keytop.wasabi;
       if (columnIndex >= 5 && columnIndex <= 7) return keytop.tanpopo;
-      return keytop.white;
+      return bodyColor;
     },
   },
   {
     name: "蒲公英マーク",
     sub: "若葉マーク風",
-    colors: [keytop.sumi, keytop.tanpopo, keytop.wasabi],
+    colors: [bodyColor, keytop.tanpopo, keytop.wasabi],
     make: ({ rowIndex, columnIndex, rowLength }) => {
       const center = (rowLength - 1) / 2;
       const distance = Math.abs(columnIndex - center);
       if ((rowIndex === 1 || rowIndex === 2) && distance <= 1.5) return keytop.wasabi;
       if ((rowIndex === 2 || rowIndex === 3) && distance >= 2 && distance <= 4) return keytop.tanpopo;
-      return keytop.sumi;
+      return bodyColor;
     },
   },
   {
     name: "藤グラデーション",
     sub: "数字キーに淡色",
-    colors: [keytop.white, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
+    colors: [bodyColor, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
     make: ({ label, columnIndex }) => {
-      if (!isNumberKey(label)) return keytop.white;
+      if (!isNumberKey(label)) return bodyColor;
       const gradient = [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora];
       return gradient[columnIndex % gradient.length];
     },
@@ -164,48 +168,48 @@ const presets: Preset[] = [
   {
     name: "空カーソル",
     sub: "矢印 / Fn / 数字",
-    colors: [keytop.sumi, keytop.sora],
-    make: ({ label, className }) => isMarkerKey(label, className) ? keytop.sora : keytop.sumi,
+    colors: [bodyColor, keytop.sora],
+    make: ({ label, className }) => isMarkerKey(label, className) ? keytop.sora : bodyColor,
   },
   {
     name: "Happy Hacking",
     sub: "好きな言葉を表現",
-    colors: [keytop.white, keytop.sakura],
+    colors: [bodyColor, keytop.sakura],
     make: ({ label }) => {
       const normalized = normalizeLabel(label);
-      return normalized && "HAPPYCKING".includes(normalized) ? keytop.sakura : keytop.white;
+      return normalized && "HAPPYCKING".includes(normalized) ? keytop.sakura : bodyColor;
     },
   },
   {
     name: "ボーダー",
     sub: "段ごとに色分け",
-    colors: [keytop.sumi, keytop.wasabi],
-    make: ({ rowIndex }) => rowIndex === 1 || rowIndex === 3 ? keytop.wasabi : keytop.sumi,
+    colors: [bodyColor, keytop.wasabi],
+    make: ({ rowIndex }) => rowIndex === 1 || rowIndex === 3 ? keytop.wasabi : bodyColor,
   },
   {
     name: "縦グラデーション",
     sub: "縦方向に配置",
-    colors: [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
+    colors: [bodyColor, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
     make: ({ rowIndex, columnIndex }) => {
       const gradient = [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora];
-      return Math.abs(columnIndex - 7) <= 1 ? gradient[rowIndex] : keytop.white;
+      return Math.abs(columnIndex - 7) <= 1 ? gradient[rowIndex] : bodyColor;
     },
   },
   {
     name: "ハート",
     sub: "記事のベスポジ",
-    colors: [keytop.white, keytop.sakura],
-    make: ({ rowIndex, label }) => isHeartKey(rowIndex, label) ? keytop.sakura : keytop.white,
+    colors: [bodyColor, keytop.sakura],
+    make: ({ rowIndex, label }) => isHeartKey(rowIndex, label) ? keytop.sakura : bodyColor,
   },
   {
     name: "Esc / Control",
     sub: "周辺アイテムと色合わせ",
-    colors: [keytop.snow, keytop.sora, keytop.fuji],
+    colors: [bodyColor, keytop.sora, keytop.fuji],
     make: ({ label }) => {
       const normalized = normalizeLabel(label);
       if (normalized === "Esc") return keytop.sora;
       if (normalized === "Control") return keytop.fuji;
-      return keytop.snow;
+      return bodyColor;
     },
   },
 ];
@@ -352,6 +356,21 @@ function textColor(hex: string): string {
   return (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000 > 155 ? "#31312e" : "#f8f6ef";
 }
 
+function defaultColorForKey({ label, className }: Pick<KeyContext, "label" | "className">): string {
+  const product = currentProductAppearance();
+  if (isWhiteProduct(product) && isWhiteProductSpecialKey(label, className)) {
+    return keytop.whiteSpecial;
+  }
+  return product.keyColor;
+}
+
+function resolveColor(color: ColorDefinition, key?: KeyContext): string {
+  if (color !== bodyColor) {
+    return color;
+  }
+  return key ? defaultColorForKey(key) : currentProductAppearance().keyColor;
+}
+
 function renderKeyboard(): void {
   const product = currentProductAppearance();
   keyboard.innerHTML = "";
@@ -360,22 +379,26 @@ function renderKeyboard(): void {
   keyboard.style.setProperty("--case-shadow", textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816");
   let index = 0;
 
-  currentRows().forEach((row) => {
+  currentRows().forEach((row, rowIndex) => {
     const rowElement = document.createElement("div");
     rowElement.className = "key-row";
 
-    row.forEach(([label, width, className = ""]) => {
+    row.forEach(([label, width, className = ""], columnIndex) => {
       const currentIndex = index++;
+      const keyContext = { index: currentIndex, rowIndex, columnIndex, rowLength: row.length, label, className };
       const key = document.createElement("button");
       key.type = "button";
       key.className = `key ${className}`;
-      key.textContent = label;
       key.setAttribute("aria-label", label ? `${label} キー` : "スペースキー");
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);
       key.style.setProperty("--legend-color", keyColors[currentIndex] === product.keyColor ? product.legendColor : textColor(keyColors[currentIndex]));
+      const keyLabel = document.createElement("span");
+      keyLabel.className = "key-label";
+      keyLabel.textContent = label;
+      key.append(keyLabel);
       key.addEventListener("click", () => {
-        keyColors[currentIndex] = selected.value;
+        keyColors[currentIndex] = resolveColor(selected.value, keyContext);
         save();
         renderKeyboard();
       });
@@ -411,34 +434,41 @@ function chooseColor(color: ColorOption, isCustom = false): void {
   document.querySelectorAll<HTMLButtonElement>(".color-button").forEach((button) => {
     button.classList.toggle("active", !isCustom && button.dataset.value === color.value);
   });
-  selectedSwatch.style.background = color.value;
+  selectedSwatch.style.background = resolveColor(color.value);
   selectionText.textContent = `選択中: ${color.name}`;
 }
 
-colors.forEach((color) => {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "color-button";
-  button.dataset.value = color.value;
-  button.setAttribute("role", "radio");
-  button.innerHTML = `<span class="color-dot" style="--color:${color.value}"></span>${color.name}`;
-  button.addEventListener("click", () => chooseColor(color));
-  palette.append(button);
-});
-
-presets.forEach((preset) => {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "preset";
-  button.innerHTML = `<span><strong>${preset.name}</strong><small>${preset.sub}</small></span><span class="preset-colors">${preset.colors.map((color) => `<i style="--color:${color}"></i>`).join("")}</span>`;
-  button.addEventListener("click", () => {
-    keyColors = currentKeyContexts().map((key) => preset.make(key));
-    save();
-    renderKeyboard();
-    toast(`${preset.name} を適用しました`);
+function renderPalette(): void {
+  palette.innerHTML = "";
+  colors.forEach((color) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "color-button";
+    button.dataset.value = color.value;
+    button.setAttribute("role", "radio");
+    button.innerHTML = `<span class="color-dot" style="--color:${resolveColor(color.value)}"></span>${color.name}`;
+    button.classList.toggle("active", selected.value === color.value);
+    button.addEventListener("click", () => chooseColor(color));
+    palette.append(button);
   });
-  presetContainer.append(button);
-});
+}
+
+function renderPresets(): void {
+  presetContainer.innerHTML = "";
+  presets.forEach((preset) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "preset";
+    button.innerHTML = `<span><strong>${preset.name}</strong><small>${preset.sub}</small></span><span class="preset-colors">${preset.colors.map((color) => `<i style="--color:${resolveColor(color)}"></i>`).join("")}</span>`;
+    button.addEventListener("click", () => {
+      keyColors = currentKeyContexts().map((key) => resolveColor(preset.make(key), key));
+      save();
+      renderKeyboard();
+      toast(`${preset.name} を適用しました`);
+    });
+    presetContainer.append(button);
+  });
+}
 
 productSeries.forEach((series) => {
   const button = document.createElement("button");
@@ -453,13 +483,7 @@ productSeries.forEach((series) => {
 });
 
 function defaultColors(): string[] {
-  const product = currentProductAppearance();
-  return currentRows().flat().map(([label, , className = ""]) => {
-    if (isWhiteProduct(product) && isWhiteProductSpecialKey(label, className)) {
-      return "#b7b3a8";
-    }
-    return product.keyColor;
-  });
+  return currentKeyContexts().map(defaultColorForKey);
 }
 
 function save(): boolean {
@@ -557,6 +581,10 @@ function renderAppearanceControls(): void {
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
+
+  renderPalette();
+  renderPresets();
+  chooseColor(selected);
 }
 
 function selectLayout(layout: string | undefined): void {
