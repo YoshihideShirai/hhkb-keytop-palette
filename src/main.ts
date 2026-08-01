@@ -1,5 +1,18 @@
 type KeyDefinition = readonly [label: string, width: number, className?: string];
 type LayoutName = "us" | "jis";
+type ProductId =
+  | "hybrid-type-s-sumi"
+  | "hybrid-type-s-white"
+  | "hybrid-type-s-snow"
+  | "hybrid-sumi"
+  | "hybrid-white"
+  | "classic-type-s-sumi"
+  | "classic-type-s-white"
+  | "classic-type-s-snow"
+  | "classic-sumi"
+  | "classic-white"
+  | "studio-sumi"
+  | "studio-snow";
 
 interface ColorOption {
   name: string;
@@ -18,10 +31,23 @@ interface Preset {
   make: (index: number, label: string) => string;
 }
 
+interface ProductAppearance {
+  id: ProductId;
+  series: string;
+  colorName: string;
+  colorValue: string;
+  keyColor: string;
+  legendColor: string;
+  legendPlacement: "corner" | "center";
+  caseStyle: "classic" | "hybrid" | "studio";
+  detail: string;
+}
+
 interface SavedState {
   layout?: string;
   colors?: string[];
   designs?: Partial<Record<LayoutName, string[]>>;
+  product?: string;
 }
 
 const colors: ColorOption[] = [
@@ -79,8 +105,24 @@ const presets: Preset[] = [
   },
 ];
 
+const productAppearances: ProductAppearance[] = [
+  { id: "hybrid-type-s-sumi", series: "HYBRID Type-S", colorName: "墨", colorValue: "#302f2c", keyColor: "#3b3b38", legendColor: "#151513", legendPlacement: "corner", caseStyle: "hybrid", detail: "無線/有線・Type-S" },
+  { id: "hybrid-type-s-white", series: "HYBRID Type-S", colorName: "白", colorValue: "#d8d2c5", keyColor: "#e7e3d8", legendColor: "#565047", legendPlacement: "corner", caseStyle: "hybrid", detail: "無線/有線・Type-S" },
+  { id: "hybrid-type-s-snow", series: "HYBRID Type-S", colorName: "雪", colorValue: "#f6f5ef", keyColor: "#f8f7f2", legendColor: "#6f6f68", legendPlacement: "center", caseStyle: "hybrid", detail: "無線/有線・Type-S" },
+  { id: "hybrid-sumi", series: "HYBRID", colorName: "墨", colorValue: "#302f2c", keyColor: "#3b3b38", legendColor: "#151513", legendPlacement: "corner", caseStyle: "hybrid", detail: "無線/有線" },
+  { id: "hybrid-white", series: "HYBRID", colorName: "白", colorValue: "#d8d2c5", keyColor: "#e7e3d8", legendColor: "#565047", legendPlacement: "corner", caseStyle: "hybrid", detail: "無線/有線" },
+  { id: "classic-type-s-sumi", series: "Classic Type-S", colorName: "墨", colorValue: "#302f2c", keyColor: "#3b3b38", legendColor: "#151513", legendPlacement: "center", caseStyle: "classic", detail: "有線・Type-S" },
+  { id: "classic-type-s-white", series: "Classic Type-S", colorName: "白", colorValue: "#d8d2c5", keyColor: "#e7e3d8", legendColor: "#565047", legendPlacement: "center", caseStyle: "classic", detail: "有線・Type-S" },
+  { id: "classic-type-s-snow", series: "Classic Type-S", colorName: "雪", colorValue: "#f6f5ef", keyColor: "#f8f7f2", legendColor: "#6f6f68", legendPlacement: "center", caseStyle: "classic", detail: "有線・Type-S" },
+  { id: "classic-sumi", series: "Classic", colorName: "墨", colorValue: "#302f2c", keyColor: "#3b3b38", legendColor: "#151513", legendPlacement: "corner", caseStyle: "classic", detail: "有線" },
+  { id: "classic-white", series: "Classic", colorName: "白", colorValue: "#d8d2c5", keyColor: "#e7e3d8", legendColor: "#565047", legendPlacement: "corner", caseStyle: "classic", detail: "有線" },
+  { id: "studio-sumi", series: "Studio", colorName: "墨", colorValue: "#2c2c29", keyColor: "#343431", legendColor: "#141412", legendPlacement: "center", caseStyle: "studio", detail: "ポインティング搭載" },
+  { id: "studio-snow", series: "Studio", colorName: "雪", colorValue: "#f2f1eb", keyColor: "#f6f5f0", legendColor: "#6b6b64", legendPlacement: "center", caseStyle: "studio", detail: "ポインティング搭載" },
+];
+
 const keyboard = queryElement<HTMLDivElement>("#keyboard");
 const palette = queryElement<HTMLDivElement>("#palette");
+const products = queryElement<HTMLDivElement>("#products");
 const presetContainer = queryElement<HTMLDivElement>("#presets");
 const selectedSwatch = queryElement<HTMLSpanElement>("#selectedSwatch");
 const selectionText = queryElement<HTMLSpanElement>("#selectionText");
@@ -93,6 +135,7 @@ const toastElement = queryElement<HTMLDivElement>("#toast");
 let selected = colors[0];
 let keyColors: string[] = [];
 let currentLayout: LayoutName = "us";
+let currentProduct: ProductId = "hybrid-type-s-sumi";
 let savedDesigns: Partial<Record<LayoutName, string[]>> = {};
 let toastTimer: number | undefined;
 
@@ -108,6 +151,14 @@ function isLayoutName(value: unknown): value is LayoutName {
   return typeof value === "string" && value in layouts;
 }
 
+function isProductId(value: unknown): value is ProductId {
+  return typeof value === "string" && productAppearances.some((product) => product.id === value);
+}
+
+function currentProductAppearance(): ProductAppearance {
+  return productAppearances.find((product) => product.id === currentProduct) ?? productAppearances[0];
+}
+
 function currentRows(): KeyDefinition[][] {
   return layouts[currentLayout].rows;
 }
@@ -121,7 +172,11 @@ function textColor(hex: string): string {
 }
 
 function renderKeyboard(): void {
+  const product = currentProductAppearance();
   keyboard.innerHTML = "";
+  keyboard.className = `keyboard keyboard-${product.caseStyle} legend-${product.legendPlacement}`;
+  keyboard.style.setProperty("--case-color", product.colorValue);
+  keyboard.style.setProperty("--case-shadow", textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816");
   let index = 0;
 
   currentRows().forEach((row) => {
@@ -137,7 +192,7 @@ function renderKeyboard(): void {
       key.setAttribute("aria-label", label ? `${label} キー` : "スペースキー");
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);
-      key.style.setProperty("--legend-color", textColor(keyColors[currentIndex]));
+      key.style.setProperty("--legend-color", keyColors[currentIndex] === product.keyColor ? product.legendColor : textColor(keyColors[currentIndex]));
       key.addEventListener("click", () => {
         keyColors[currentIndex] = selected.value;
         save();
@@ -149,7 +204,14 @@ function renderKeyboard(): void {
     keyboard.append(rowElement);
   });
 
-  keyboard.setAttribute("aria-label", `HHKB ${layouts[currentLayout].name}`);
+  if (product.caseStyle === "studio") {
+    const pointer = document.createElement("span");
+    pointer.className = "pointing-stick";
+    pointer.setAttribute("aria-hidden", "true");
+    keyboard.append(pointer);
+  }
+
+  keyboard.setAttribute("aria-label", `HHKB ${product.series} ${product.colorName} ${layouts[currentLayout].name}`);
 }
 
 function chooseColor(color: ColorOption, isCustom = false): void {
@@ -187,15 +249,26 @@ presets.forEach((preset) => {
   presetContainer.append(button);
 });
 
+productAppearances.forEach((product) => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "product";
+  button.dataset.product = product.id;
+  button.setAttribute("aria-pressed", "false");
+  button.innerHTML = `<span class="product-swatch" style="--color:${product.colorValue}"></span><span><strong>${product.series}</strong><small>${product.colorName} / ${product.detail}</small></span>`;
+  button.addEventListener("click", () => selectProduct(product.id, true));
+  products.append(button);
+});
+
 function defaultColors(): string[] {
-  let i = 0;
-  return currentRows().flat().map(([label]) => presets[0].make(i++, label));
+  const product = currentProductAppearance();
+  return currentRows().flat().map(() => product.keyColor);
 }
 
 function save(): boolean {
   savedDesigns[currentLayout] = keyColors;
   try {
-    localStorage.setItem("hhkb-keytop-palette", JSON.stringify({ layout: currentLayout, designs: savedDesigns }));
+    localStorage.setItem("hhkb-keytop-palette", JSON.stringify({ layout: currentLayout, product: currentProduct, designs: savedDesigns }));
     return true;
   } catch {
     return false;
@@ -220,6 +293,7 @@ function load(): void {
       savedDesigns.us = stored;
     } else if (stored && typeof stored === "object") {
       currentLayout = isLayoutName(stored.layout) ? stored.layout : "us";
+      currentProduct = isProductId(stored.product) ? stored.product : "hybrid-type-s-sumi";
       savedDesigns = stored.designs || { [currentLayout]: stored.colors };
     }
 
@@ -227,6 +301,29 @@ function load(): void {
     keyColors = Array.isArray(values) && values.length === currentRows().flat().length ? values : defaultColors();
   } catch {
     keyColors = defaultColors();
+  }
+}
+
+function selectProduct(product: string | undefined, applyFactoryColors = false): void {
+  if (!isProductId(product)) return;
+
+  currentProduct = product;
+  if (applyFactoryColors) {
+    keyColors = defaultColors();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>(".product").forEach((button) => {
+    const active = button.dataset.product === currentProduct;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  renderKeyboard();
+  save();
+
+  if (applyFactoryColors) {
+    const appearance = currentProductAppearance();
+    toast(`${appearance.series} ${appearance.colorName} の外観にしました`);
   }
 }
 
@@ -268,7 +365,7 @@ resetButton.addEventListener("click", () => {
 
 shareButton.addEventListener("click", async () => {
   const url = new URL(location.href);
-  url.searchParams.set("design", btoa(JSON.stringify({ layout: currentLayout, colors: keyColors })));
+  url.searchParams.set("design", btoa(JSON.stringify({ layout: currentLayout, product: currentProduct, colors: keyColors })));
   history.replaceState(null, "", url);
 
   try {
@@ -280,6 +377,7 @@ shareButton.addEventListener("click", async () => {
 });
 
 load();
+selectProduct(currentProduct);
 document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
   const active = button.dataset.layout === currentLayout;
   button.classList.toggle("active", active);
