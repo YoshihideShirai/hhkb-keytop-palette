@@ -1,5 +1,6 @@
 type KeyDefinition = readonly [label: string, width: number, className?: string];
 type LayoutName = "us" | "jis";
+type ProductSeries = "HYBRID Type-S" | "HYBRID" | "Classic Type-S" | "Classic" | "Studio";
 type ProductId =
   | "hybrid-type-s-sumi"
   | "hybrid-type-s-white"
@@ -33,7 +34,7 @@ interface Preset {
 
 interface ProductAppearance {
   id: ProductId;
-  series: string;
+  series: ProductSeries;
   colorName: string;
   colorValue: string;
   keyColor: string;
@@ -120,9 +121,12 @@ const productAppearances: ProductAppearance[] = [
   { id: "studio-snow", series: "Studio", colorName: "雪", colorValue: "#f2f1eb", keyColor: "#f6f5f0", legendColor: "#6b6b64", legendPlacement: "center", caseStyle: "studio", detail: "ポインティング搭載" },
 ];
 
+const productSeries: ProductSeries[] = ["HYBRID Type-S", "HYBRID", "Classic Type-S", "Classic", "Studio"];
+
 const keyboard = queryElement<HTMLDivElement>("#keyboard");
 const palette = queryElement<HTMLDivElement>("#palette");
-const products = queryElement<HTMLDivElement>("#products");
+const modelSeries = queryElement<HTMLDivElement>("#modelSeries");
+const bodyColors = queryElement<HTMLDivElement>("#bodyColors");
 const presetContainer = queryElement<HTMLDivElement>("#presets");
 const selectedSwatch = queryElement<HTMLSpanElement>("#selectedSwatch");
 const selectionText = queryElement<HTMLSpanElement>("#selectionText");
@@ -157,6 +161,11 @@ function isProductId(value: unknown): value is ProductId {
 
 function currentProductAppearance(): ProductAppearance {
   return productAppearances.find((product) => product.id === currentProduct) ?? productAppearances[0];
+}
+
+function productsForCurrentSeries(): ProductAppearance[] {
+  const currentSeries = currentProductAppearance().series;
+  return productAppearances.filter((product) => product.series === currentSeries);
 }
 
 function currentRows(): KeyDefinition[][] {
@@ -249,15 +258,16 @@ presets.forEach((preset) => {
   presetContainer.append(button);
 });
 
-productAppearances.forEach((product) => {
+productSeries.forEach((series) => {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "product";
-  button.dataset.product = product.id;
+  button.className = "product model-button";
+  button.dataset.series = series;
   button.setAttribute("aria-pressed", "false");
-  button.innerHTML = `<span class="product-swatch" style="--color:${product.colorValue}"></span><span><strong>${product.series}</strong><small>${product.colorName} / ${product.detail}</small></span>`;
-  button.addEventListener("click", () => selectProduct(product.id, true));
-  products.append(button);
+  const representative = productAppearances.find((product) => product.series === series);
+  button.innerHTML = `<span class="product-swatch" style="--color:${representative?.colorValue ?? "#d8d2c5"}"></span><span><strong>${series}</strong><small>${representative?.detail ?? ""}</small></span>`;
+  button.addEventListener("click", () => selectSeries(series));
+  modelSeries.append(button);
 });
 
 function defaultColors(): string[] {
@@ -312,11 +322,7 @@ function selectProduct(product: string | undefined, applyFactoryColors = false):
     keyColors = defaultColors();
   }
 
-  document.querySelectorAll<HTMLButtonElement>(".product").forEach((button) => {
-    const active = button.dataset.product === currentProduct;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
+  renderAppearanceControls();
 
   renderKeyboard();
   save();
@@ -325,6 +331,45 @@ function selectProduct(product: string | undefined, applyFactoryColors = false):
     const appearance = currentProductAppearance();
     toast(`${appearance.series} ${appearance.colorName} の外観にしました`);
   }
+}
+
+function selectSeries(series: ProductSeries): void {
+  const current = currentProductAppearance();
+  const next = productAppearances.find((product) => product.series === series && product.colorName === current.colorName)
+    ?? productAppearances.find((product) => product.series === series);
+
+  if (next) {
+    selectProduct(next.id, true);
+  }
+}
+
+function renderAppearanceControls(): void {
+  const current = currentProductAppearance();
+
+  document.querySelectorAll<HTMLButtonElement>(".model-button").forEach((button) => {
+    const active = button.dataset.series === current.series;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  bodyColors.innerHTML = "";
+  productsForCurrentSeries().forEach((product) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "body-color";
+    button.dataset.product = product.id;
+    button.setAttribute("aria-pressed", String(product.id === currentProduct));
+    button.innerHTML = `<span class="body-color-swatch" style="--color:${product.colorValue}"></span><span>${product.colorName}</span>`;
+    button.classList.toggle("active", product.id === currentProduct);
+    button.addEventListener("click", () => selectProduct(product.id, true));
+    bodyColors.append(button);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>(".body-color").forEach((button) => {
+    const active = button.dataset.product === currentProduct;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
 }
 
 function selectLayout(layout: string | undefined): void {
