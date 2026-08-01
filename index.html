@@ -37,10 +37,6 @@
               <h2>キーボード</h2>
             </div>
             <div class="toolbar-options">
-              <div class="layout-switch" role="group" aria-label="キーボード配列">
-                <button class="layout-button active" type="button" data-layout="us" aria-pressed="true">英語配列</button>
-                <button class="layout-button" type="button" data-layout="jis" aria-pressed="false">日本語配列</button>
-              </div>
               <p><span class="selected-swatch" id="selectedSwatch"></span><span id="selectionText">選択中: Sumi</span></p>
             </div>
           </div>
@@ -51,8 +47,29 @@
         </div>
 
         <aside class="controls-card">
-          <div class="section-title">
+          <div class="section-title model-title">
             <span class="step">02</span>
+            <h2>モデル</h2>
+          </div>
+          <div id="modelSeries" class="model-series" role="group" aria-label="HHKBモデル"></div>
+
+          <div class="section-title layout-title">
+            <span class="step">03</span>
+            <h2>配列</h2>
+          </div>
+          <div class="layout-switch layout-options" role="group" aria-label="キーボード配列">
+            <button class="layout-button active" type="button" data-layout="us" aria-pressed="true">英語配列</button>
+            <button class="layout-button" type="button" data-layout="jis" aria-pressed="false">日本語配列</button>
+          </div>
+
+          <div class="section-title body-color-title">
+            <span class="step">04</span>
+            <h2>本体色</h2>
+          </div>
+          <div id="bodyColors" class="body-colors" role="group" aria-label="HHKB本体色"></div>
+
+          <div class="section-title color-title">
+            <span class="step">05</span>
             <h2>カラー</h2>
           </div>
           <div id="palette" class="palette" role="radiogroup" aria-label="キートップカラー"></div>
@@ -66,7 +83,7 @@
           </label>
 
           <div class="presets-heading">
-            <div><span class="step">03</span><h2>プリセット</h2></div>
+            <div><span class="step">06</span><h2>プリセット</h2></div>
             <span>ワンタップで適用</span>
           </div>
           <div id="presets" class="presets"></div>
@@ -86,6 +103,6 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <footer><p>HHKB KEYTOP PALETTE</p><p>非公式の配色シミュレーターです。</p></footer>
-    <script src="app.js"></script>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
