@@ -52,14 +52,16 @@ interface SavedState {
 }
 
 const colors: ColorOption[] = [
-  { name: "Sumi", value: "#3b3b38" },
-  { name: "Ivory", value: "#e7e3d8" },
-  { name: "Snow", value: "#f5f4ef" },
-  { name: "Brick", value: "#b54d3d" },
-  { name: "Sakura", value: "#db9b99" },
-  { name: "Mustard", value: "#d3a73e" },
-  { name: "Moss", value: "#727a4e" },
-  { name: "Aoi", value: "#4a6f83" },
+  { name: "墨", value: "#3b3b38" },
+  { name: "白", value: "#e7e3d8" },
+  { name: "白 特殊キー", value: "#b7b3a8" },
+  { name: "雪", value: "#f8f7f2" },
+  { name: "桜", value: "#f1c6c9" },
+  { name: "山葵", value: "#b8c58a" },
+  { name: "蒲公英", value: "#f0c94b" },
+  { name: "藤", value: "#c8b2d8" },
+  { name: "空", value: "#a9d2e8" },
+  { name: "灰", value: "#8b8b84" },
 ];
 
 const layouts: Record<LayoutName, Layout> = {
@@ -87,22 +89,22 @@ const layouts: Record<LayoutName, Layout> = {
 
 const presets: Preset[] = [
   {
-    name: "Classic",
-    sub: "静かな定番",
-    colors: ["#e7e3d8", "#3b3b38", "#b54d3d"],
-    make: (_, label) => label === "Esc" ? "#b54d3d" : (/[A-Z]/.test(label) && label.length === 1 ? "#e7e3d8" : "#3b3b38"),
+    name: "定番",
+    sub: "白・墨・雪",
+    colors: ["#e7e3d8", "#b7b3a8", "#3b3b38", "#f8f7f2"],
+    make: (_, label) => label === "Esc" ? "#f8f7f2" : (/[A-Z]/.test(label) && label.length === 1 ? "#e7e3d8" : "#b7b3a8"),
   },
   {
-    name: "Bloom",
-    sub: "やわらかな春",
-    colors: ["#f5f4ef", "#db9b99", "#727a4e"],
-    make: (i, label) => label === "Esc" || label === "Return" ? "#727a4e" : (i % 7 === 0 ? "#db9b99" : "#f5f4ef"),
+    name: "花暦",
+    sub: "桜・山葵・蒲公英",
+    colors: ["#f1c6c9", "#b8c58a", "#f0c94b"],
+    make: (i, label) => label === "Esc" || label === "Return" ? "#b8c58a" : (i % 7 === 0 ? "#f1c6c9" : "#f0c94b"),
   },
   {
-    name: "Night Shift",
-    sub: "深夜の集中",
-    colors: ["#3b3b38", "#4a6f83", "#d3a73e"],
-    make: (_, label) => label === "Esc" ? "#d3a73e" : (["Control", "Shift", "Fn", "Alt", "◇"].includes(label) ? "#4a6f83" : "#3b3b38"),
+    name: "静寂",
+    sub: "墨・灰・空",
+    colors: ["#3b3b38", "#8b8b84", "#a9d2e8"],
+    make: (_, label) => label === "Esc" ? "#a9d2e8" : (["Control", "Shift", "Fn", "Alt", "◇"].includes(label) ? "#8b8b84" : "#3b3b38"),
   },
 ];
 
@@ -170,6 +172,35 @@ function productsForCurrentSeries(): ProductAppearance[] {
 
 function currentRows(): KeyDefinition[][] {
   return layouts[currentLayout].rows;
+}
+
+function isWhiteProduct(product: ProductAppearance): boolean {
+  return product.colorName === "白";
+}
+
+function isWhiteProductSpecialKey(label: string, className: string): boolean {
+  const normalized = label.split("\n")[0];
+  return className === "space" || [
+    "Esc",
+    "Tab",
+    "Delete",
+    "BS",
+    "Control",
+    "Return",
+    "Enter",
+    "Shift",
+    "Fn",
+    "Alt",
+    "◇",
+    "半角",
+    "無変換",
+    "変換",
+    "かな",
+    "↑",
+    "←",
+    "↓",
+    "→",
+  ].includes(normalized);
 }
 
 function textColor(hex: string): string {
@@ -272,7 +303,12 @@ productSeries.forEach((series) => {
 
 function defaultColors(): string[] {
   const product = currentProductAppearance();
-  return currentRows().flat().map(() => product.keyColor);
+  return currentRows().flat().map(([label, , className = ""]) => {
+    if (isWhiteProduct(product) && isWhiteProductSpecialKey(label, className)) {
+      return "#b7b3a8";
+    }
+    return product.keyColor;
+  });
 }
 
 function save(): boolean {
