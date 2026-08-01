@@ -249,7 +249,18 @@ function renderKeyboard(): void {
     pointer.className = "pointing-stick";
     pointer.setAttribute("aria-hidden", "true");
     keyboard.append(pointer);
+
+    const mouseButtons = document.createElement("span");
+    mouseButtons.className = "studio-mouse-buttons";
+    mouseButtons.setAttribute("aria-hidden", "true");
+    keyboard.append(mouseButtons);
   }
+
+  const badge = document.createElement("span");
+  badge.className = "keyboard-badge";
+  badge.textContent = "HHKB";
+  badge.setAttribute("aria-hidden", "true");
+  keyboard.append(badge);
 
   keyboard.setAttribute("aria-label", `HHKB ${product.series} ${product.colorName} ${layouts[currentLayout].name}`);
 }
