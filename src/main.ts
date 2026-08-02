@@ -346,6 +346,7 @@ const customColor = queryElement<HTMLInputElement>("#customColor");
 const customColorValue = queryElement<HTMLOutputElement>("#customColorValue");
 const resetButton = queryElement<HTMLButtonElement>("#resetButton");
 const saveButton = queryElement<HTMLButtonElement>("#saveButton");
+const xShareButton = queryElement<HTMLButtonElement>("#xShareButton");
 const shareButton = queryElement<HTMLButtonElement>("#shareButton");
 const toastElement = queryElement<HTMLDivElement>("#toast");
 
@@ -631,6 +632,11 @@ function updateUrl(): void {
   history.replaceState(null, "", url);
 }
 
+function currentShareUrl(): string {
+  updateUrl();
+  return location.href;
+}
+
 function syncUserChangeToUrl(): void {
   updateUrl();
 }
@@ -770,14 +776,21 @@ saveButton.addEventListener("click", () => {
   toast(persisted ? "デザインを保存しました" : "保存は利用できません");
 });
 
+xShareButton.addEventListener("click", () => {
+  const intentUrl = new URL("https://twitter.com/intent/tweet");
+  intentUrl.searchParams.set("url", currentShareUrl());
+  intentUrl.searchParams.set("text", "HHKB Keytop Paletteで配色を作りました");
+  window.open(intentUrl.href, "_blank", "noopener,noreferrer");
+});
+
 shareButton.addEventListener("click", async () => {
-  updateUrl();
+  const shareUrl = currentShareUrl();
 
   try {
-    await navigator.clipboard.writeText(location.href);
+    await navigator.clipboard.writeText(shareUrl);
     toast("共有URLをコピーしました");
   } catch {
-    window.prompt("このURLをコピーしてください", location.href);
+    window.prompt("このURLをコピーしてください", shareUrl);
   }
 });
 
