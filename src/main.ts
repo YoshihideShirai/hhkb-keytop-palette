@@ -345,6 +345,7 @@ const selectionText = queryElement<HTMLSpanElement>("#selectionText");
 const customColor = queryElement<HTMLInputElement>("#customColor");
 const customColorValue = queryElement<HTMLOutputElement>("#customColorValue");
 const resetButton = queryElement<HTMLButtonElement>("#resetButton");
+const saveButton = queryElement<HTMLButtonElement>("#saveButton");
 const shareButton = queryElement<HTMLButtonElement>("#shareButton");
 const toastElement = queryElement<HTMLDivElement>("#toast");
 
@@ -527,7 +528,7 @@ function renderKeyboard(): void {
       key.append(keySides, keyLabel);
       key.addEventListener("click", () => {
         keyColors[currentIndex] = resolveColor(selected.value, keyContext);
-        save();
+        syncUserChangeToUrl();
         renderKeyboard();
       });
       rowElement.append(key);
@@ -590,7 +591,7 @@ function renderPresets(): void {
     button.innerHTML = `<span><strong>${preset.name}</strong><small>${preset.sub}</small></span><span class="preset-colors">${preset.colors.map((color) => `<i style="--color:${resolveColor(color)}"></i>`).join("")}</span>`;
     button.addEventListener("click", () => {
       keyColors = currentKeyContexts().map((key) => resolveColor(preset.make(key), key));
-      save();
+      syncUserChangeToUrl();
       renderKeyboard();
       toast(`${preset.name} を適用しました`);
     });
@@ -624,6 +625,16 @@ function save(): boolean {
   }
 }
 
+function updateUrl(): void {
+  const url = new URL(location.href);
+  url.searchParams.set("design", btoa(JSON.stringify({ layout: currentLayout, product: currentProduct, colors: keyColors })));
+  history.replaceState(null, "", url);
+}
+
+function syncUserChangeToUrl(): void {
+  updateUrl();
+}
+
 function toast(message: string): void {
   toastElement.textContent = message;
   toastElement.classList.add("show");
@@ -653,7 +664,7 @@ function load(): void {
   }
 }
 
-function selectProduct(product: string | undefined, applyFactoryColors = false): void {
+function selectProduct(product: string | undefined, applyFactoryColors = false, userInitiated = false): void {
   if (!isProductId(product)) return;
 
   currentProduct = product;
@@ -664,7 +675,9 @@ function selectProduct(product: string | undefined, applyFactoryColors = false):
   renderAppearanceControls();
 
   renderKeyboard();
-  save();
+  if (userInitiated) {
+    syncUserChangeToUrl();
+  }
 
   if (applyFactoryColors) {
     const appearance = currentProductAppearance();
@@ -678,7 +691,7 @@ function selectSeries(series: ProductSeries): void {
     ?? productAppearances.find((product) => product.series === series);
 
   if (next) {
-    selectProduct(next.id, true);
+    selectProduct(next.id, true, true);
   }
 }
 
@@ -700,7 +713,7 @@ function renderAppearanceControls(): void {
     button.setAttribute("aria-pressed", String(product.id === currentProduct));
     button.innerHTML = `<span class="body-color-swatch" style="--color:${product.colorValue}"></span><span>${product.colorName}</span>`;
     button.classList.toggle("active", product.id === currentProduct);
-    button.addEventListener("click", () => selectProduct(product.id, true));
+    button.addEventListener("click", () => selectProduct(product.id, true, true));
     bodyColors.append(button);
   });
 
@@ -731,8 +744,8 @@ function selectLayout(layout: string | undefined): void {
 
   renderPresets();
   renderKeyboard();
-  const persisted = save();
-  toast(persisted ? `${layouts[currentLayout].name}に切り替えました` : `${layouts[currentLayout].name}に切り替えました（保存は利用できません）`);
+  syncUserChangeToUrl();
+  toast(`${layouts[currentLayout].name}に切り替えました`);
 }
 
 document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
@@ -747,21 +760,24 @@ customColor.addEventListener("input", (event) => {
 
 resetButton.addEventListener("click", () => {
   keyColors = defaultColors();
-  save();
+  syncUserChangeToUrl();
   renderKeyboard();
   toast("デザインをリセットしました");
 });
 
+saveButton.addEventListener("click", () => {
+  const persisted = save();
+  toast(persisted ? "デザインを保存しました" : "保存は利用できません");
+});
+
 shareButton.addEventListener("click", async () => {
-  const url = new URL(location.href);
-  url.searchParams.set("design", btoa(JSON.stringify({ layout: currentLayout, product: currentProduct, colors: keyColors })));
-  history.replaceState(null, "", url);
+  updateUrl();
 
   try {
-    await navigator.clipboard.writeText(url.href);
+    await navigator.clipboard.writeText(location.href);
     toast("共有URLをコピーしました");
   } catch {
-    window.prompt("このURLをコピーしてください", url.href);
+    window.prompt("このURLをコピーしてください", location.href);
   }
 });
 
