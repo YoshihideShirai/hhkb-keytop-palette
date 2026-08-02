@@ -112,40 +112,40 @@ const layouts: Record<LayoutName, Layout> = {
   },
 };
 
-const presets: Preset[] = [
+const usPresets: Preset[] = [
   {
     name: "中央印字 墨",
-    sub: "ミニマムな墨",
+    sub: "やわらかな墨",
     colors: [keytop.sumi],
     make: () => keytop.sumi,
   },
   {
     name: "中央印字 白",
-    sub: "白 + 特殊キー",
+    sub: "くすみ白 + 特殊キー",
     colors: [keytop.white, keytop.whiteSpecial],
     make: ({ label, className }) => isWhiteProductSpecialKey(label, className) ? keytop.whiteSpecial : keytop.white,
   },
   {
-    name: "桜アクセント",
-    sub: "Esc / Control",
+    name: "桜",
+    sub: "花びらの赤",
     colors: [bodyColor, keytop.sakura],
-    make: ({ label }) => ["Esc", "Control"].includes(normalizeLabel(label)) ? keytop.sakura : bodyColor,
+    make: ({ label }) => isAlphaKey(label) ? keytop.sakura : bodyColor,
   },
   {
-    name: "山葵アクセント",
-    sub: "桜と花見団子",
+    name: "花見三色団子",
+    sub: "桜 / 山葵 / 蒲公英",
     colors: [bodyColor, keytop.sakura, keytop.wasabi, keytop.tanpopo],
-    make: ({ label, columnIndex }) => {
-      const normalized = normalizeLabel(label);
-      if (["Esc", "Control"].includes(normalized)) return keytop.sakura;
-      if (["Return", "Enter", "BS", "Delete"].includes(normalized)) return keytop.wasabi;
-      if (columnIndex >= 5 && columnIndex <= 7) return keytop.tanpopo;
+    make: ({ label, rowIndex }) => {
+      if (!isAlphaKey(label)) return bodyColor;
+      if (rowIndex === 1) return keytop.sakura;
+      if (rowIndex === 2) return keytop.wasabi;
+      if (rowIndex === 3) return keytop.tanpopo;
       return bodyColor;
     },
   },
   {
     name: "蒲公英マーク",
-    sub: "若葉マーク風",
+    sub: "新年度の若葉マーク",
     colors: [bodyColor, keytop.tanpopo, keytop.wasabi],
     make: ({ rowIndex, columnIndex, rowLength }) => {
       const center = (rowLength - 1) / 2;
@@ -157,7 +157,7 @@ const presets: Preset[] = [
   },
   {
     name: "藤グラデーション",
-    sub: "数字キーに淡色",
+    sub: "数字キーグラデーション",
     colors: [bodyColor, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
     make: ({ label, columnIndex }) => {
       if (!isNumberKey(label)) return bodyColor;
@@ -166,29 +166,26 @@ const presets: Preset[] = [
     },
   },
   {
-    name: "空カーソル",
-    sub: "矢印 / Fn / 数字",
-    colors: [bodyColor, keytop.sora],
-    make: ({ label, className }) => isMarkerKey(label, className) ? keytop.sora : bodyColor,
+    name: "Happy Hacking",
+    sub: "好きな言葉を桜で",
+    colors: [bodyColor, keytop.sakura],
+    make: ({ label }) => isHappyHackingKey(label) ? keytop.sakura : bodyColor,
   },
   {
-    name: "Happy Hacking",
-    sub: "好きな言葉を表現",
-    colors: [bodyColor, keytop.sakura],
-    make: ({ label }) => {
-      const normalized = normalizeLabel(label);
-      return normalized && "HAPPYCKING".includes(normalized) ? keytop.sakura : bodyColor;
-    },
+    name: "目印キー",
+    sub: "数字 / Fn を蒲公英に",
+    colors: [bodyColor, keytop.tanpopo],
+    make: ({ label }) => isNumberKey(label) || normalizeLabel(label) === "Fn" ? keytop.tanpopo : bodyColor,
   },
   {
     name: "ボーダー",
-    sub: "段ごとに色分け",
+    sub: "山葵で視認性アップ",
     colors: [bodyColor, keytop.wasabi],
     make: ({ rowIndex }) => rowIndex === 1 || rowIndex === 3 ? keytop.wasabi : bodyColor,
   },
   {
     name: "縦グラデーション",
-    sub: "縦方向に配置",
+    sub: "カラーを縦方向に",
     colors: [bodyColor, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
     make: ({ rowIndex, columnIndex }) => {
       const gradient = [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora];
@@ -197,13 +194,13 @@ const presets: Preset[] = [
   },
   {
     name: "ハート",
-    sub: "記事のベスポジ",
+    sub: "桜のベスポジ",
     colors: [bodyColor, keytop.sakura],
-    make: ({ rowIndex, label }) => isHeartKey(rowIndex, label) ? keytop.sakura : bodyColor,
+    make: ({ rowIndex, label }) => isUsHeartKey(rowIndex, label) ? keytop.sakura : bodyColor,
   },
   {
     name: "Esc / Control",
-    sub: "周辺アイテムと色合わせ",
+    sub: "空と藤のアクセント",
     colors: [bodyColor, keytop.sora, keytop.fuji],
     make: ({ label }) => {
       const normalized = normalizeLabel(label);
@@ -213,6 +210,111 @@ const presets: Preset[] = [
     },
   },
 ];
+
+const jisPresets: Preset[] = [
+  {
+    name: "中央印字 墨",
+    sub: "やわらかな墨",
+    colors: [keytop.sumi],
+    make: () => keytop.sumi,
+  },
+  {
+    name: "中央印字 白",
+    sub: "くすみ白 + 特殊キー",
+    colors: [keytop.white, keytop.whiteSpecial],
+    make: ({ label, className }) => isWhiteProductSpecialKey(label, className) ? keytop.whiteSpecial : keytop.white,
+  },
+  {
+    name: "桜",
+    sub: "花びらの赤",
+    colors: [bodyColor, keytop.sakura],
+    make: ({ label }) => isAlphaKey(label) ? keytop.sakura : bodyColor,
+  },
+  {
+    name: "花見三色団子",
+    sub: "桜 / 山葵 / 蒲公英",
+    colors: [bodyColor, keytop.sakura, keytop.wasabi, keytop.tanpopo],
+    make: ({ label, rowIndex }) => {
+      if (!isAlphaKey(label)) return bodyColor;
+      if (rowIndex === 1) return keytop.sakura;
+      if (rowIndex === 2) return keytop.wasabi;
+      if (rowIndex === 3) return keytop.tanpopo;
+      return bodyColor;
+    },
+  },
+  {
+    name: "蒲公英マーク",
+    sub: "新年度の若葉マーク",
+    colors: [bodyColor, keytop.tanpopo, keytop.wasabi],
+    make: ({ rowIndex, label }) => {
+      const normalized = normalizeLabel(label);
+      if (rowIndex === 1 && ["T", "Y", "U"].includes(normalized)) return keytop.wasabi;
+      if (rowIndex === 2 && ["F", "G", "H", "J"].includes(normalized)) return keytop.wasabi;
+      if (rowIndex === 2 && ["D", "K", "L"].includes(normalized)) return keytop.tanpopo;
+      if (rowIndex === 3 && ["C", "V", "B", "N"].includes(normalized)) return keytop.tanpopo;
+      return bodyColor;
+    },
+  },
+  {
+    name: "藤グラデーション",
+    sub: "数字キーグラデーション",
+    colors: [bodyColor, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
+    make: ({ label, columnIndex }) => {
+      if (!isNumberKey(label)) return bodyColor;
+      const gradient = [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora];
+      return gradient[columnIndex % gradient.length];
+    },
+  },
+  {
+    name: "Happy Hacking",
+    sub: "好きな言葉を桜で",
+    colors: [bodyColor, keytop.sakura],
+    make: ({ label }) => isHappyHackingKey(label) ? keytop.sakura : bodyColor,
+  },
+  {
+    name: "目印キー",
+    sub: "数字 / Fn / 矢印を蒲公英に",
+    colors: [bodyColor, keytop.tanpopo],
+    make: ({ label, className }) => isMarkerKey(label, className) ? keytop.tanpopo : bodyColor,
+  },
+  {
+    name: "ボーダー",
+    sub: "山葵で視認性アップ",
+    colors: [bodyColor, keytop.wasabi],
+    make: ({ rowIndex }) => rowIndex === 1 || rowIndex === 3 ? keytop.wasabi : bodyColor,
+  },
+  {
+    name: "縦グラデーション",
+    sub: "カラーを縦方向に",
+    colors: [bodyColor, keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora],
+    make: ({ rowIndex, columnIndex }) => {
+      const gradient = [keytop.sakura, keytop.tanpopo, keytop.wasabi, keytop.fuji, keytop.sora];
+      return Math.abs(columnIndex - 7) <= 1 ? gradient[rowIndex] : bodyColor;
+    },
+  },
+  {
+    name: "ハート",
+    sub: "空色のベスポジ",
+    colors: [bodyColor, keytop.sora],
+    make: ({ rowIndex, label }) => isJisHeartKey(rowIndex, label) ? keytop.sora : bodyColor,
+  },
+  {
+    name: "Esc / Control",
+    sub: "空と藤のアクセント",
+    colors: [bodyColor, keytop.sora, keytop.fuji],
+    make: ({ label }) => {
+      const normalized = normalizeLabel(label);
+      if (normalized === "Esc") return keytop.sora;
+      if (normalized === "Control") return keytop.fuji;
+      return bodyColor;
+    },
+  },
+];
+
+const presetsByLayout: Record<LayoutName, Preset[]> = {
+  us: usPresets,
+  jis: jisPresets,
+};
 
 const productAppearances: ProductAppearance[] = [
   { id: "hybrid-type-s-sumi", series: "HYBRID Type-S", colorName: "墨", colorValue: "#302f2c", keyColor: "#3b3b38", legendColor: "#151513", legendPlacement: "corner", caseStyle: "hybrid", detail: "無線/有線・Type-S" },
@@ -302,16 +404,37 @@ function isNumberKey(label: string): boolean {
   return /^\d/.test(normalizeLabel(label));
 }
 
+function isAlphaKey(label: string): boolean {
+  return /^[A-Z]$/.test(normalizeLabel(label));
+}
+
+function isHappyHackingKey(label: string): boolean {
+  const normalized = normalizeLabel(label);
+  return normalized !== "" && "HAPPYCKING".includes(normalized);
+}
+
 function isMarkerKey(label: string, className: string): boolean {
   const normalized = normalizeLabel(label);
   return className === "arrow" || normalized === "Fn" || isNumberKey(label);
 }
 
-function isHeartKey(rowIndex: number, label: string): boolean {
+function isUsHeartKey(rowIndex: number, label: string): boolean {
+  const normalized = normalizeLabel(label);
+  const heartRows = [
+    ["8", "9", "-", "="],
+    ["U", "I", "O", "P", "[", "]"],
+    ["J", "K", "L", ";", "'"],
+    ["M", ",", ".", "/"],
+    ["◇"],
+  ];
+  return heartRows[rowIndex]?.includes(normalized) ?? false;
+}
+
+function isJisHeartKey(rowIndex: number, label: string): boolean {
   const normalized = normalizeLabel(label);
   const heartRows = [
     ["7", "8", "0", "-"],
-    ["Y", "U", "I", "O", "P", "@", "["],
+    ["Y", "U", "I", "O", "P", "@"],
     ["H", "J", "K", "L", ";"],
     ["M", ",", "."],
     ["かな"],
@@ -458,7 +581,7 @@ function renderPalette(): void {
 
 function renderPresets(): void {
   presetContainer.innerHTML = "";
-  presets.forEach((preset) => {
+  presetsByLayout[currentLayout].forEach((preset) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "preset";
@@ -604,6 +727,7 @@ function selectLayout(layout: string | undefined): void {
     button.setAttribute("aria-pressed", String(active));
   });
 
+  renderPresets();
   renderKeyboard();
   const persisted = save();
   toast(persisted ? `${layouts[currentLayout].name}に切り替えました` : `${layouts[currentLayout].name}に切り替えました（保存は利用できません）`);
