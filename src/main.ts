@@ -850,6 +850,7 @@ xShareButton.addEventListener("click", () => {
   const intentUrl = new URL("https://twitter.com/intent/tweet");
   intentUrl.searchParams.set("url", currentShareUrl());
   intentUrl.searchParams.set("text", "HHKB Keytop Paletteで配色を作りました");
+  intentUrl.searchParams.set("hashtags", "hhkb");
   window.open(intentUrl.href, "_blank", "noopener,noreferrer");
 });
 
