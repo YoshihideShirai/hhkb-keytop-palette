@@ -1,3 +1,5 @@
+import "@fortawesome/fontawesome-free/css/all.min.css";
+
 type KeyDefinition = readonly [label: string, width: number, className?: string];
 type LayoutName = "us" | "jis";
 type ProductSeries = "HYBRID Type-S" | "HYBRID" | "Classic Type-S" | "Classic" | "Studio";

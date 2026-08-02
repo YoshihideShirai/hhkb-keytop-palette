@@ -15,9 +15,20 @@
         <span><strong>HHKB</strong><small>KEYTOP PALETTE</small></span>
       </a>
       <div class="header-actions">
-        <button id="resetButton" class="button button-ghost" type="button">リセット</button>
-        <button id="shareButton" class="button button-dark" type="button">
-          <span aria-hidden="true">↗</span> デザインを共有
+        <button id="resetButton" class="button button-ghost icon-button" type="button" aria-label="デザインをリセット">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+        </button>
+        <a
+          class="button button-ghost icon-button repo-link"
+          href="https://github.com/yoshihideshirai/hhkb-keytop-palette"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="GitHubリポジトリを開く"
+        >
+          <i class="fa-brands fa-github" aria-hidden="true"></i>
+        </a>
+        <button id="shareButton" class="button button-dark icon-button" type="button" aria-label="デザインを共有">
+          <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
         </button>
       </div>
     </header>
@@ -43,7 +54,7 @@
           <div class="keyboard-stage">
             <div class="keyboard" id="keyboard" aria-label="HHKB 英語配列"></div>
           </div>
-          <p class="hint"><span aria-hidden="true">↖</span> キーをクリック / タップして色を変更</p>
+          <p class="hint"><i class="fa-solid fa-arrow-pointer" aria-hidden="true"></i> キーをクリック / タップして色を変更</p>
         </div>
 
         <aside class="controls-card">
