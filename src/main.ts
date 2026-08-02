@@ -62,6 +62,14 @@ interface SavedState {
   product?: string;
 }
 
+interface CompactSavedState {
+  v?: number;
+  l?: string;
+  m?: string;
+  d?: string[];
+  i?: string;
+}
+
 const bodyColor = "__body_color__" as const;
 type ColorDefinition = string | typeof bodyColor;
 
@@ -626,9 +634,70 @@ function save(): boolean {
   }
 }
 
+function toBase64Url(value: string): string {
+  return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function fromBase64Url(value: string): string {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  return atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "="));
+}
+
+function encodeColorToken(color: string): string {
+  return /^#[\da-f]{6}$/i.test(color) ? color.slice(1).toLowerCase() : color;
+}
+
+function decodeColorToken(color: string): string {
+  return /^[\da-f]{6}$/i.test(color) ? `#${color}` : color;
+}
+
+function serializeDesignParam(): string {
+  const dictionary = Array.from(new Set(keyColors));
+  const indexes = keyColors.map((color) => dictionary.indexOf(color));
+  const productIndex = productAppearances.findIndex((product) => product.id === currentProduct);
+  const compact: CompactSavedState = {
+    v: 1,
+    l: currentLayout === "jis" ? "j" : "u",
+    m: Math.max(productIndex, 0).toString(36),
+    d: dictionary.map(encodeColorToken),
+    i: toBase64Url(String.fromCharCode(...indexes)),
+  };
+  return toBase64Url(JSON.stringify(compact));
+}
+
+function deserializeDesignParam(value: string): SavedState | string[] | null {
+  const stored = JSON.parse(fromBase64Url(value)) as CompactSavedState | SavedState | string[];
+
+  if (Array.isArray(stored)) {
+    return stored;
+  }
+
+  if (stored && typeof stored === "object" && "v" in stored && stored.v === 1) {
+    const compact = stored as CompactSavedState;
+    if (!Array.isArray(compact.d) || typeof compact.i !== "string") {
+      return null;
+    }
+
+    const dictionary = compact.d.map(decodeColorToken);
+    const colors = Array.from(fromBase64Url(compact.i), (char) => dictionary[char.charCodeAt(0)]);
+    if (colors.some((color) => typeof color !== "string")) {
+      return null;
+    }
+
+    const productIndex = compact.m ? parseInt(compact.m, 36) : 0;
+    return {
+      layout: compact.l === "j" ? "jis" : "us",
+      product: productAppearances[Number.isNaN(productIndex) ? 0 : productIndex]?.id,
+      colors,
+    };
+  }
+
+  return stored as SavedState;
+}
+
 function updateUrl(): void {
   const url = new URL(location.href);
-  url.searchParams.set("design", btoa(JSON.stringify({ layout: currentLayout, product: currentProduct, colors: keyColors })));
+  url.searchParams.set("design", serializeDesignParam());
   history.replaceState(null, "", url);
 }
 
@@ -652,8 +721,9 @@ function load(): void {
   const query = new URLSearchParams(location.search).get("design");
 
   try {
-    const source = query ? atob(query) : localStorage.getItem("hhkb-keytop-palette");
-    const stored = source ? JSON.parse(source) as SavedState | string[] : null;
+    const stored = query
+      ? deserializeDesignParam(query)
+      : JSON.parse(localStorage.getItem("hhkb-keytop-palette") || "null") as SavedState | string[] | null;
 
     if (Array.isArray(stored)) {
       savedDesigns.us = stored;
