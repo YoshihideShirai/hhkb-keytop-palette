@@ -393,10 +393,13 @@ function renderKeyboard(): void {
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);
       key.style.setProperty("--legend-color", keyColors[currentIndex] === product.keyColor ? product.legendColor : textColor(keyColors[currentIndex]));
+      const keySides = document.createElement("span");
+      keySides.className = "key-sides";
+      keySides.setAttribute("aria-hidden", "true");
       const keyLabel = document.createElement("span");
       keyLabel.className = "key-label";
       keyLabel.textContent = label;
-      key.append(keyLabel);
+      key.append(keySides, keyLabel);
       key.addEventListener("click", () => {
         keyColors[currentIndex] = resolveColor(selected.value, keyContext);
         save();
