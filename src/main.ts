@@ -114,13 +114,17 @@ function renderKeyboard(): void {
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);
       key.style.setProperty("--legend-color", keyColors[currentIndex] === product.keyColor ? product.legendColor : textColor(keyColors[currentIndex]));
-      const keySides = document.createElement("span");
-      keySides.className = "key-sides";
-      keySides.setAttribute("aria-hidden", "true");
+      const keySide = document.createElement("span");
+      keySide.className = "key-side";
+      keySide.setAttribute("aria-hidden", "true");
+      const keyTop = document.createElement("span");
+      keyTop.className = "key-top";
+      keyTop.setAttribute("aria-hidden", "true");
       const keyLabel = document.createElement("span");
       keyLabel.className = "key-label";
       keyLabel.textContent = label;
-      key.append(keySides, keyLabel);
+      keyTop.append(keyLabel);
+      key.append(keySide, keyTop);
       key.addEventListener("click", () => {
         keyColors[currentIndex] = resolveColor(selected.value, keyContext);
         syncUserChangeToUrl();
