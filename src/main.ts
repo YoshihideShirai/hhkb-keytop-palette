@@ -102,7 +102,7 @@ function renderKeyboard(): void {
 
   currentRows().forEach((row, rowIndex) => {
     const rowElement = document.createElement("div");
-    rowElement.className = "key-row";
+    rowElement.className = `key-row key-row-${rowIndex + 1}`;
 
     row.forEach(([label, width, className = ""], columnIndex) => {
       const currentIndex = index++;
