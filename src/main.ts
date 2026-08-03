@@ -34,12 +34,15 @@ const xShareButton = queryElement<HTMLButtonElement>("#xShareButton");
 const shareButton = queryElement<HTMLButtonElement>("#shareButton");
 const toastElement = queryElement<HTMLDivElement>("#toast");
 
+type ViewMode = "design" | "preview";
+
 let selected = colors[0];
 let keyColors: string[] = [];
 let currentLayout: LayoutName = "us";
 let currentProduct: ProductId = "hybrid-type-s-sumi";
 let savedDesigns: Partial<Record<LayoutName, string[]>> = {};
 let toastTimer: number | undefined;
+let viewMode: ViewMode = "preview";
 
 
 function isLayoutName(value: unknown): value is LayoutName {
@@ -95,14 +98,14 @@ function resolveColor(color: ColorDefinition, key?: KeyContext): string {
 function renderKeyboard(): void {
   const product = currentProductAppearance();
   keyboard.innerHTML = "";
-  keyboard.className = `keyboard keyboard-${currentLayout} keyboard-${product.caseStyle} legend-${product.legendPlacement}`;
+  keyboard.className = `keyboard keyboard-${currentLayout} keyboard-${product.caseStyle} legend-${product.legendPlacement} view-${viewMode}`;
   keyboard.style.setProperty("--case-color", product.colorValue);
   keyboard.style.setProperty("--case-shadow", textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816");
   let index = 0;
 
   currentRows().forEach((row, rowIndex) => {
     const rowElement = document.createElement("div");
-    rowElement.className = "key-row";
+    rowElement.className = `key-row key-row-${rowIndex + 1}`;
 
     row.forEach(([label, width, className = ""], columnIndex) => {
       const currentIndex = index++;
@@ -142,6 +145,13 @@ function renderKeyboard(): void {
     mouseButtons.className = "studio-mouse-buttons";
     mouseButtons.setAttribute("aria-hidden", "true");
     keyboard.append(mouseButtons);
+
+    ["left", "right"].forEach((side) => {
+      const gesturePad = document.createElement("span");
+      gesturePad.className = `gesture-pad gesture-pad-${side}`;
+      gesturePad.setAttribute("aria-hidden", "true");
+      keyboard.append(gesturePad);
+    });
   }
 
   const badge = document.createElement("span");
@@ -412,6 +422,20 @@ function selectLayout(layout: string | undefined): void {
 
 document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
   button.addEventListener("click", () => selectLayout(button.dataset.layout));
+});
+
+document.querySelectorAll<HTMLButtonElement>(".view-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    const nextView = button.dataset.view;
+    if (nextView !== "design" && nextView !== "preview") return;
+    viewMode = nextView;
+    document.querySelectorAll<HTMLButtonElement>(".view-button").forEach((viewButton) => {
+      const active = viewButton.dataset.view === viewMode;
+      viewButton.classList.toggle("active", active);
+      viewButton.setAttribute("aria-pressed", String(active));
+    });
+    renderKeyboard();
+  });
 });
 
 customColor.addEventListener("input", (event) => {
