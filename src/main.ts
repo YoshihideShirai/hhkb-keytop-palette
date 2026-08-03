@@ -23,6 +23,7 @@ const keyboard = queryElement<HTMLDivElement>("#keyboard");
 const palette = queryElement<HTMLDivElement>("#palette");
 const modelSeries = queryElement<HTMLDivElement>("#modelSeries");
 const bodyColors = queryElement<HTMLDivElement>("#bodyColors");
+const presetsToggle = queryElement<HTMLButtonElement>("#presetsToggle");
 const presetContainer = queryElement<HTMLDivElement>("#presets");
 const selectedSwatch = queryElement<HTMLSpanElement>("#selectedSwatch");
 const selectionText = queryElement<HTMLSpanElement>("#selectionText");
@@ -41,6 +42,14 @@ let currentProduct: ProductId = "hybrid-type-s-sumi";
 let savedDesigns: Partial<Record<LayoutName, string[]>> = {};
 let toastTimer: number | undefined;
 
+function setPresetsExpanded(expanded: boolean): void {
+  presetsToggle.setAttribute("aria-expanded", String(expanded));
+  presetContainer.hidden = !expanded;
+}
+
+presetsToggle.addEventListener("click", () => {
+  setPresetsExpanded(presetsToggle.getAttribute("aria-expanded") !== "true");
+});
 
 function isLayoutName(value: unknown): value is LayoutName {
   return typeof value === "string" && value in layouts;

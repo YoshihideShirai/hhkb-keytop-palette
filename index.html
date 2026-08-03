@@ -83,11 +83,20 @@
             </span>
           </label>
 
-          <div class="presets-heading">
-            <div><h2>かんたん適用</h2></div>
-            <span>ワンタップで適用</span>
-          </div>
-          <div id="presets" class="presets"></div>
+          <button
+            id="presetsToggle"
+            class="presets-heading"
+            type="button"
+            aria-expanded="false"
+            aria-controls="presets"
+          >
+            <span class="presets-heading-copy">
+              <h2>かんたん適用</h2>
+              <span>ワンタップで適用</span>
+            </span>
+            <i class="fa-solid fa-chevron-down presets-chevron" aria-hidden="true"></i>
+          </button>
+          <div id="presets" class="presets" hidden></div>
         </aside>
 
         <div class="canvas-card">
