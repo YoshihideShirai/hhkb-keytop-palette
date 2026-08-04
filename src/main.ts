@@ -11,6 +11,7 @@ import {
   type CompactSavedState,
   type KeyContext,
   type KeyDefinition,
+  type KeyLegend,
   type LayoutName,
   type ProductAppearance,
   type ProductId,
@@ -75,15 +76,19 @@ function currentRows(): KeyDefinition[][] {
 function currentKeyContexts(): KeyContext[] {
   let index = 0;
   return currentRows().flatMap((row, rowIndex) =>
-    row.map(([label, , className = ""], columnIndex) => ({
+    row.map(([legend, , className = ""], columnIndex) => ({
       index: index++,
       rowIndex,
       columnIndex,
       rowLength: row.length,
-      label,
+      label: accessibleLegend(legend),
       className,
     }))
   );
+}
+
+function accessibleLegend(legend: KeyLegend): string {
+  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol].filter(Boolean).join(" ");
 }
 
 function defaultColorForKey({ label, className }: Pick<KeyContext, "label" | "className">): string {
@@ -104,7 +109,7 @@ function resolveColor(color: ColorDefinition, key?: KeyContext): string {
 function renderKeyboard(): void {
   const product = currentProductAppearance();
   keyboard.innerHTML = "";
-  keyboard.className = `keyboard keyboard-${currentLayout} keyboard-${product.caseStyle} legend-${product.legendPlacement}`;
+  keyboard.className = `keyboard keyboard-${currentLayout} keyboard-${product.caseStyle} legend-${product.legendVariant}`;
   keyboard.style.setProperty("--case-color", product.colorValue);
   keyboard.style.setProperty("--case-shadow", textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816");
   let index = 0;
@@ -113,8 +118,9 @@ function renderKeyboard(): void {
     const rowElement = document.createElement("div");
     rowElement.className = `key-row key-row-${rowIndex + 1}`;
 
-    row.forEach(([label, width, className = ""], columnIndex) => {
+    row.forEach(([legend, width, className = ""], columnIndex) => {
       const currentIndex = index++;
+      const label = accessibleLegend(legend);
       const keyContext = { index: currentIndex, rowIndex, columnIndex, rowLength: row.length, label, className };
       const key = document.createElement("button");
       key.type = "button";
@@ -123,6 +129,7 @@ function renderKeyboard(): void {
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);
       key.style.setProperty("--legend-color", keyColors[currentIndex] === product.keyColor ? product.legendColor : textColor(keyColors[currentIndex]));
+      key.style.setProperty("--legend-opacity", keyColors[currentIndex] === product.keyColor && product.legendContrast === "low" ? ".48" : ".82");
       const keySide = document.createElement("span");
       keySide.className = "key-side";
       keySide.setAttribute("aria-hidden", "true");
@@ -131,7 +138,24 @@ function renderKeyboard(): void {
       keyTop.setAttribute("aria-hidden", "true");
       const keyLabel = document.createElement("span");
       keyLabel.className = "key-label";
-      keyLabel.textContent = label;
+      if (legend.primary) {
+        const primary = document.createElement("span");
+        primary.className = "legend-primary";
+        primary.textContent = legend.primary;
+        keyLabel.append(primary);
+      }
+      if (legend.secondary) {
+        const secondary = document.createElement("span");
+        secondary.className = "legend-secondary";
+        secondary.textContent = legend.secondary;
+        keyLabel.append(secondary);
+      }
+      if (legend.symbol) {
+        const symbol = document.createElement("span");
+        symbol.className = "legend-symbol";
+        symbol.textContent = legend.symbol;
+        keyLabel.append(symbol);
+      }
       keyTop.append(keyLabel);
       key.append(keySide, keyTop);
       key.addEventListener("click", () => {

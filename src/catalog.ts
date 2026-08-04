@@ -1,4 +1,14 @@
-import { bodyColor, type ColorOption, type Layout, type LayoutName } from "./types";
+import { bodyColor, type ColorOption, type KeyDefinition, type KeyLegend, type Layout, type LayoutName } from "./types";
+
+function key(primary: string, width: number, className?: string, secondary?: string): KeyDefinition {
+  return [{ primary, ...(secondary ? { secondary } : {}) }, width, className];
+}
+
+function symbol(symbol: string, width: number, className?: string): KeyDefinition {
+  return [{ primary: "", symbol, accessibleLabel: symbol }, width, className];
+}
+
+const blankLegend: KeyLegend = { primary: "", accessibleLabel: "スペース" };
 
 export const colors: ColorOption[] = [
   { name: "本体カラー", value: bodyColor },
@@ -30,21 +40,21 @@ export const layouts: Record<LayoutName, Layout> = {
   us: {
     name: "英語配列",
     rows: [
-      [["Esc", 1], ["1\n!", 1], ["2\n@", 1], ["3\n#", 1], ["4\n$", 1], ["5\n%", 1], ["6\n^", 1], ["7\n&", 1], ["8\n*", 1], ["9\n(", 1], ["0\n)", 1], ["-\n_", 1], ["=\n+", 1], ["\\\n|", 1], ["`\n~", 1]],
-      [["Tab", 1.5], ["Q", 1], ["W", 1], ["E", 1], ["R", 1], ["T", 1], ["Y", 1], ["U", 1], ["I", 1], ["O", 1], ["P", 1], ["[\n{", 1], ["]\n}", 1], ["Delete", 1.5]],
-      [["Control", 1.75], ["A", 1], ["S", 1], ["D", 1], ["F", 1], ["G", 1], ["H", 1], ["J", 1], ["K", 1], ["L", 1], [";\n:", 1], ["'\n\"", 1], ["Return", 2.25]],
-      [["Shift", 2.25], ["Z", 1], ["X", 1], ["C", 1], ["V", 1], ["B", 1], ["N", 1], ["M", 1], [",\n<", 1], [".\n>", 1], ["/\n?", 1], ["Shift", 2.75]],
-      [["Fn", 1.25], ["Alt", 1.25], ["◇", 1.25], ["", 6, "space"], ["◇", 1.25], ["Alt", 1.25], ["Fn", 1.25]],
+      [key("Esc", 1), key("1", 1, undefined, "!"), key("2", 1, undefined, "@"), key("3", 1, undefined, "#"), key("4", 1, undefined, "$"), key("5", 1, undefined, "%"), key("6", 1, undefined, "^"), key("7", 1, undefined, "&"), key("8", 1, undefined, "*"), key("9", 1, undefined, "("), key("0", 1, undefined, ")"), key("-", 1, undefined, "_"), key("=", 1, undefined, "+"), key("\\", 1, undefined, "|"), key("`", 1, undefined, "~")],
+      [key("Tab", 1.5), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), key("[", 1, undefined, "{"), key("]", 1, undefined, "}"), key("Delete", 1.5)],
+      [key("Control", 1.75), ..."ASDFGHJKL".split("").map((label) => key(label, 1)), key(";", 1, undefined, ":"), key("'", 1, undefined, '"'), key("Return", 2.25)],
+      [key("Shift", 2.25), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("Shift", 2.75)],
+      [key("Fn", 1.25), key("Alt", 1.25), symbol("◇", 1.25), [blankLegend, 6, "space"], symbol("◇", 1.25), key("Alt", 1.25), key("Fn", 1.25)],
     ],
   },
   jis: {
     name: "日本語配列",
     rows: [
-      [["Esc", 1], ["1\n!", 1], ["2\n\"", 1], ["3\n#", 1], ["4\n$", 1], ["5\n%", 1], ["6\n&", 1], ["7\n'", 1], ["8\n(", 1], ["9\n)", 1], ["0", 1], ["-\n=", 1], ["^\n~", 1], ["¥\n|", 1], ["BS", 1]],
-      [["Tab", 1.5], ["Q", 1], ["W", 1], ["E", 1], ["R", 1], ["T", 1], ["Y", 1], ["U", 1], ["I", 1], ["O", 1], ["P", 1], ["@\n`", 1], ["[\n{", 1], ["", 0, "spacer"], ["Enter", 1.5, "jis-enter"]],
-      [["Control", 1.75], ["A", 1], ["S", 1], ["D", 1], ["F", 1], ["G", 1], ["H", 1], ["J", 1], ["K", 1], ["L", 1], [";\n+", 1], [":\n*", 1], ["]\n}", 1]],
-      [["Shift", 2], ["Z", 1], ["X", 1], ["C", 1], ["V", 1], ["B", 1], ["N", 1], ["M", 1], [",\n<", 1], [".\n>", 1], ["/\n?", 1], ["\\\n_", 1], ["", 0, "spacer"], ["↑", 1, "arrow"], ["Shift", 1]],
-      [["Fn", 1], ["", 0.25, "spacer"], ["半角\n/全角", 1], ["◇", 1], ["Alt", 1], ["無変換", 1], ["", 2.5, "space"], ["変換", 1], ["かな", 1], ["Alt", 1], ["Fn", 1], ["", 0.25, "spacer"], ["←", 1, "arrow"], ["↓", 1, "arrow"], ["→", 1, "arrow"]],
+      [key("Esc", 1), key("1", 1, undefined, "!"), key("2", 1, undefined, '"'), key("3", 1, undefined, "#"), key("4", 1, undefined, "$"), key("5", 1, undefined, "%"), key("6", 1, undefined, "&"), key("7", 1, undefined, "'"), key("8", 1, undefined, "("), key("9", 1, undefined, ")"), key("0", 1), key("-", 1, undefined, "="), key("^", 1, undefined, "~"), key("¥", 1, undefined, "|"), key("BS", 1)],
+      [key("Tab", 1.5), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), key("@", 1, undefined, "`"), key("[", 1, undefined, "{"), [blankLegend, 0, "spacer"], key("Enter", 1.5, "jis-enter")],
+      [key("Control", 1.75), ..."ASDFGHJKL".split("").map((label) => key(label, 1)), key(";", 1, undefined, "+"), key(":", 1, undefined, "*"), key("]", 1, undefined, "}")],
+      [key("Shift", 2), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("\\", 1, undefined, "_"), [blankLegend, 0, "spacer"], symbol("↑", 1, "arrow"), key("Shift", 1)],
+      [key("Fn", 1), [blankLegend, .25, "spacer"], key("半角", 1, undefined, "全角"), symbol("◇", 1), key("Alt", 1), key("無変換", 1), [blankLegend, 2.5, "space"], key("変換", 1), key("かな", 1), key("Alt", 1), key("Fn", 1), [blankLegend, .25, "spacer"], symbol("←", 1, "arrow"), symbol("↓", 1, "arrow"), symbol("→", 1, "arrow")],
     ],
   },
 };

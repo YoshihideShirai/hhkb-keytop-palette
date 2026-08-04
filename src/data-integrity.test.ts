@@ -3,17 +3,17 @@ import { describe, expect, it } from "vitest";
 import { layouts } from "./catalog";
 import { presetsByLayout } from "./presets";
 import { productAppearances, productSeries } from "./products";
-import type { KeyContext, LayoutName } from "./types";
+import { legendVariants, type KeyContext, type LayoutName } from "./types";
 
 function keyContexts(layoutName: LayoutName): KeyContext[] {
   let index = 0;
   return layouts[layoutName].rows.flatMap((row, rowIndex) =>
-    row.map(([label, , className = ""], columnIndex) => ({
+    row.map(([legend, , className = ""], columnIndex) => ({
       index: index++,
       rowIndex,
       columnIndex,
       rowLength: row.length,
-      label,
+      label: legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol].filter(Boolean).join(" "),
       className,
     })),
   );
@@ -28,6 +28,14 @@ describe("keyboard catalog", () => {
       expect(width).toBeGreaterThanOrEqual(0);
     });
   });
+
+  it.each(Object.entries(layouts))("provides structured legends for every visible %s key", (_name, layout) => {
+    layout.rows.flat().forEach(([legend, , className]) => {
+      if (className === "spacer" || className === "space") return;
+      expect(legend.primary || legend.symbol).toBeTruthy();
+      expect([legend.primary, legend.secondary, legend.symbol].filter(Boolean).every((part) => !part?.includes("\n"))).toBe(true);
+    });
+  });
 });
 
 describe("product catalog", () => {
@@ -38,6 +46,18 @@ describe("product catalog", () => {
     productSeries.forEach((series) => {
       expect(productAppearances.some((product) => product.series === series)).toBe(true);
     });
+  });
+
+  it("assigns a supported model-specific legend variant to every product", () => {
+    productAppearances.forEach(({ legendVariant }) => {
+      expect(legendVariants).toContain(legendVariant);
+    });
+  });
+
+  it("keeps traditional Classic Type-S colors corner-printed and Snow center-printed", () => {
+    expect(productAppearances.find(({ id }) => id === "classic-type-s-sumi")?.legendVariant).toBe("standard-corner");
+    expect(productAppearances.find(({ id }) => id === "classic-type-s-white")?.legendVariant).toBe("standard-corner");
+    expect(productAppearances.find(({ id }) => id === "classic-type-s-snow")?.legendVariant).toBe("snow-center");
   });
 });
 
