@@ -118,7 +118,7 @@ function renderKeyboard(): void {
       const keyContext = { index: currentIndex, rowIndex, columnIndex, rowLength: row.length, label, className };
       const key = document.createElement("button");
       key.type = "button";
-      key.className = `key ${className}`;
+      key.className = `key${width >= 2 ? " key-wide" : ""}${className ? ` ${className}` : ""}`;
       key.setAttribute("aria-label", label ? `${label} キー` : "スペースキー");
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);
