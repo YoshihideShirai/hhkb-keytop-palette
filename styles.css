@@ -60,7 +60,7 @@ main { width: min(1320px, calc(100% - 40px)); margin: auto; }
 .keyboard-studio::before { content: ""; position: absolute; z-index: 1; left: 18px; right: 18px; top: 13px; height: 5px; border-radius: 999px; background: rgba(0,0,0,.18); pointer-events: none; }
 .key-row { position: relative; z-index: 1; display: flex; justify-content: center; gap: var(--key-gap); margin-bottom: var(--key-row-gap); }.key-row:last-child { margin-bottom: 0; }
 .keyboard-jis .key-row { justify-content: flex-start; }
-.key { --key-shape-inset: var(--key-top-inset); --key-shape-front-depth: var(--key-front-depth); position: relative; z-index: 1; width: calc(var(--pitch) * var(--w, 1) - var(--key-gap)); height: var(--key-height); flex: 0 0 auto; padding: 0; border: 0; background: transparent; color: var(--legend-color); font-size: clamp(7px, .75vw, 10px); font-weight: 700; white-space: pre-line; line-height: 1.15; cursor: pointer; transition: transform .1s; }
+.key { --key-shape-inset: var(--key-top-inset); --key-shape-front-depth: var(--key-front-depth); position: relative; z-index: 1; width: calc(var(--pitch) * var(--w, 1) - var(--key-gap)); height: var(--key-height); flex: 0 0 auto; padding: 0; border: 0; background: transparent; color: var(--legend-color); font-size: clamp(6px, .68vw, 9px); font-weight: 500; line-height: 1.1; cursor: pointer; transition: transform .1s; }
 .key-side { position: absolute; z-index: 1; inset: 2px var(--key-side-inset) 1px; border: 1px solid color-mix(in srgb, var(--key-color), #000 14%); border-radius: var(--key-side-radius); background: linear-gradient(180deg, var(--key-color), color-mix(in srgb, var(--key-color), #000 10%)); box-shadow: 0 2px 2px rgb(0 0 0 / 16%); pointer-events: none; }
 .key-top { position: absolute; z-index: 2; inset: 1px var(--key-shape-inset) calc(var(--key-shape-front-depth) + 1px); display: flex; align-items: flex-start; justify-content: flex-start; padding: 6px 5px; border: 1px solid color-mix(in srgb, var(--key-color), #000 10%); border-bottom-color: color-mix(in srgb, var(--key-color), #000 14%); border-radius: var(--key-top-radius); background: radial-gradient(ellipse 72% 44% at 50% 52%, color-mix(in srgb, var(--key-color), #000 3%) 0%, transparent 72%), linear-gradient(145deg, rgba(255,255,255,.05), transparent 38%), linear-gradient(180deg, color-mix(in srgb, var(--key-color), #fff 5%), var(--key-color) 62%, color-mix(in srgb, var(--key-color), #000 4%)); box-shadow: inset 0 1px 1px rgba(255,255,255,.12), inset 0 -1px 2px rgba(0,0,0,.07), 0 1px 1px rgba(0,0,0,.07); pointer-events: none; }
 .key-wide { --key-shape-inset: max(1px, calc(var(--key-top-inset) * .8)); }
@@ -71,8 +71,18 @@ main { width: min(1320px, calc(100% - 40px)); margin: auto; }
 .key-row-4 { transform: translateY(2px); }
 .key-row-1 .key-top { transform: rotateX(2deg); transform-origin: center bottom; }
 .key-row-2 .key-top { transform: rotateX(1deg); transform-origin: center bottom; }
-.key-label { text-shadow: 0 1px 0 color-mix(in srgb, var(--key-color), #fff 12%); }
-.legend-center .key-top { align-items: center; justify-content: center; text-align: center; }
+.key-label { position: relative; width: 100%; height: 100%; opacity: var(--legend-opacity, .82); text-shadow: none; }
+.legend-primary, .legend-secondary, .legend-symbol { position: absolute; display: block; }
+.legend-standard-corner .legend-primary { top: 0; left: 0; }
+.legend-standard-corner .legend-secondary { top: 0; right: 0; font-size: .86em; }
+.legend-snow-center .key-top, .legend-anniversary-center .key-top, .legend-studio-center .key-top { align-items: center; justify-content: center; text-align: center; }
+.legend-snow-center .legend-primary, .legend-anniversary-center .legend-primary, .legend-studio-center .legend-primary,
+.legend-snow-center .legend-symbol, .legend-anniversary-center .legend-symbol, .legend-studio-center .legend-symbol { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.legend-snow-center .legend-secondary, .legend-anniversary-center .legend-secondary, .legend-studio-center .legend-secondary { top: 12%; left: 50%; transform: translateX(-50%); font-size: .72em; }
+.keyboard-us.legend-standard-corner .legend-secondary { font-size: .84em; }
+.keyboard-jis.legend-standard-corner .legend-secondary { font-size: .78em; }
+.keyboard-jis.legend-snow-center .legend-secondary, .keyboard-jis.legend-anniversary-center .legend-secondary, .keyboard-jis.legend-studio-center .legend-secondary { top: 8%; font-size: .68em; }
+.legend-symbol { font-size: 1.25em; }
 .key.spacer { padding: 0; border: 0; background: transparent; box-shadow: none; visibility: hidden; pointer-events: none; }
 .key.spacer .key-side, .key.spacer .key-top { display: none; }
 .key.jis-enter { --key-shape-inset: max(1px, calc(var(--key-top-inset) * .75)); z-index: 3; height: calc(var(--key-height) * 2 + var(--key-row-gap)); margin-bottom: calc(-1 * (var(--key-height) + var(--key-row-gap))); clip-path: polygon(0 0, 100% 0, 100% 100%, calc(17% + var(--key-shape-inset) / 2) 100%, calc(17% + var(--key-shape-inset) / 2) 50%, 0 50%); }

@@ -1,4 +1,12 @@
-export type KeyDefinition = readonly [label: string, width: number, className?: string];
+export interface KeyLegend {
+  primary: string;
+  secondary?: string;
+  /** Non-textual or uncommon marks, such as the HHKB diamond and arrow legends. */
+  symbol?: string;
+  accessibleLabel?: string;
+}
+
+export type KeyDefinition = readonly [legend: KeyLegend, width: number, className?: string];
 export type LayoutName = "us" | "jis";
 export type ProductSeries = "HYBRID Type-S" | "HYBRID" | "Classic Type-S" | "Classic" | "Studio";
 export type ProductId =
@@ -48,10 +56,14 @@ export interface ProductAppearance {
   colorValue: string;
   keyColor: string;
   legendColor: string;
-  legendPlacement: "corner" | "center";
+  legendVariant: LegendVariant;
+  legendContrast: "standard" | "low";
   caseStyle: "classic" | "hybrid" | "studio";
   detail: string;
 }
+
+export const legendVariants = ["standard-corner", "snow-center", "anniversary-center", "studio-center"] as const;
+export type LegendVariant = (typeof legendVariants)[number];
 
 export interface SavedState {
   layout?: string;
