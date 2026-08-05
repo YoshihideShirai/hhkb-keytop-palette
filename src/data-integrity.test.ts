@@ -13,7 +13,7 @@ function keyContexts(layoutName: LayoutName): KeyContext[] {
       rowIndex,
       columnIndex,
       rowLength: row.length,
-      label: legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol].filter(Boolean).join(" "),
+      label: legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol, legend.icon].filter(Boolean).join(" "),
       className,
     })),
   );
@@ -32,8 +32,8 @@ describe("keyboard catalog", () => {
   it.each(Object.entries(layouts))("provides structured legends for every visible %s key", (_name, layout) => {
     layout.rows.flat().forEach(([legend, , className]) => {
       if (className === "spacer" || className === "space") return;
-      expect(legend.primary || legend.symbol).toBeTruthy();
-      expect([legend.primary, legend.secondary, legend.symbol].filter(Boolean).every((part) => !part?.includes("\n"))).toBe(true);
+      expect(legend.primary || legend.symbol || legend.icon).toBeTruthy();
+      expect([legend.primary, legend.secondary, legend.symbol, legend.icon].filter(Boolean).every((part) => !part?.includes("\n"))).toBe(true);
     });
   });
 });

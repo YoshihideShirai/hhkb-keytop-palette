@@ -1,11 +1,11 @@
-import { bodyColor, type ColorOption, type KeyDefinition, type KeyLegend, type Layout, type LayoutName } from "./types";
+import { bodyColor, type ColorOption, type KeyDefinition, type KeyIcon, type KeyLegend, type Layout, type LayoutName } from "./types";
 
 function key(primary: string, width: number, className?: string, secondary?: string): KeyDefinition {
   return [{ primary, ...(secondary ? { secondary } : {}) }, width, className];
 }
 
-function symbol(symbol: string, width: number, className?: string): KeyDefinition {
-  return [{ primary: "", symbol, accessibleLabel: symbol }, width, className];
+function icon(icon: KeyIcon, accessibleLabel: string, width: number, className?: string): KeyDefinition {
+  return [{ primary: "", icon, accessibleLabel }, width, className];
 }
 
 const blankLegend: KeyLegend = { primary: "", accessibleLabel: "スペース" };
@@ -44,7 +44,7 @@ export const layouts: Record<LayoutName, Layout> = {
       [key("Tab", 1.5), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), key("[", 1, undefined, "{"), key("]", 1, undefined, "}"), key("Delete", 1.5)],
       [key("Control", 1.75), ..."ASDFGHJKL".split("").map((label) => key(label, 1)), key(";", 1, undefined, ":"), key("'", 1, undefined, '"'), key("Return", 2.25)],
       [key("Shift", 2.25), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("Shift", 2.75)],
-      [key("Fn", 1.25), key("Alt", 1.25), symbol("◇", 1.25), [blankLegend, 6, "space"], symbol("◇", 1.25), key("Alt", 1.25), key("Fn", 1.25)],
+      [key("Fn", 1.25), key("Alt", 1.25), icon("diamond", "◇", 1.25), [blankLegend, 6, "space"], icon("diamond", "◇", 1.25), key("Alt", 1.25), key("Fn", 1.25)],
     ],
   },
   jis: {
@@ -53,8 +53,8 @@ export const layouts: Record<LayoutName, Layout> = {
       [key("Esc", 1), key("1", 1, undefined, "!"), key("2", 1, undefined, '"'), key("3", 1, undefined, "#"), key("4", 1, undefined, "$"), key("5", 1, undefined, "%"), key("6", 1, undefined, "&"), key("7", 1, undefined, "'"), key("8", 1, undefined, "("), key("9", 1, undefined, ")"), key("0", 1), key("-", 1, undefined, "="), key("^", 1, undefined, "~"), key("¥", 1, undefined, "|"), key("BS", 1)],
       [key("Tab", 1.5), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), key("@", 1, undefined, "`"), key("[", 1, undefined, "{"), [blankLegend, 0, "spacer"], key("Enter", 1.5, "jis-enter")],
       [key("Control", 1.75), ..."ASDFGHJKL".split("").map((label) => key(label, 1)), key(";", 1, undefined, "+"), key(":", 1, undefined, "*"), key("]", 1, undefined, "}")],
-      [key("Shift", 2), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("\\", 1, undefined, "_"), [blankLegend, 0, "spacer"], symbol("↑", 1, "arrow"), key("Shift", 1)],
-      [key("Fn", 1), [blankLegend, .25, "spacer"], key("半角", 1, undefined, "全角"), symbol("◇", 1), key("Alt", 1), key("無変換", 1), [blankLegend, 2.5, "space"], key("変換", 1), key("かな", 1), key("Alt", 1), key("Fn", 1), [blankLegend, .25, "spacer"], symbol("←", 1, "arrow"), symbol("↓", 1, "arrow"), symbol("→", 1, "arrow")],
+      [key("Shift", 2), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("\\", 1, undefined, "_"), [blankLegend, 0, "spacer"], icon("arrow-up", "↑", 1, "arrow"), key("Shift", 1)],
+      [key("Fn", 1), [blankLegend, .25, "spacer"], key("半角", 1, undefined, "全角"), icon("diamond", "◇", 1), key("Alt", 1), key("無変換", 1), [blankLegend, 2.5, "space"], key("変換", 1), key("かな", 1), key("Alt", 1), key("Fn", 1), [blankLegend, .25, "spacer"], icon("arrow-left", "←", 1, "arrow"), icon("arrow-down", "↓", 1, "arrow"), icon("arrow-right", "→", 1, "arrow")],
     ],
   },
 };

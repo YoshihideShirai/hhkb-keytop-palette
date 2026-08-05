@@ -11,6 +11,7 @@ import {
   type CompactSavedState,
   type KeyContext,
   type KeyDefinition,
+  type KeyIcon,
   type KeyLegend,
   type LayoutName,
   type ProductAppearance,
@@ -88,7 +89,36 @@ function currentKeyContexts(): KeyContext[] {
 }
 
 function accessibleLegend(legend: KeyLegend): string {
-  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol].filter(Boolean).join(" ");
+  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol, legend.icon].filter(Boolean).join(" ");
+}
+
+function createLegendIcon(icon: KeyIcon): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "legend-icon-svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("focusable", "false");
+  svg.setAttribute("aria-hidden", "true");
+
+  if (icon === "diamond") {
+    const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    polygon.setAttribute("points", "12 3 21 12 12 21 3 12");
+    svg.append(polygon);
+    return svg;
+  }
+
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  const arrowHead = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  const paths: Record<Exclude<KeyIcon, "diamond">, [line: string, arrowHead: string]> = {
+    "arrow-up": ["M12 20V4", "M5 11l7-7 7 7"],
+    "arrow-down": ["M12 4v16", "M5 13l7 7 7-7"],
+    "arrow-left": ["M20 12H4", "M11 5l-7 7 7 7"],
+    "arrow-right": ["M4 12h16", "M13 5l7 7-7 7"],
+  };
+  const [linePath, arrowHeadPath] = paths[icon];
+  line.setAttribute("d", linePath);
+  arrowHead.setAttribute("d", arrowHeadPath);
+  svg.append(line, arrowHead);
+  return svg;
 }
 
 function defaultColorForKey({ label, className }: Pick<KeyContext, "label" | "className">): string {
@@ -155,6 +185,12 @@ function renderKeyboard(): void {
         symbol.className = "legend-symbol";
         symbol.textContent = legend.symbol;
         keyLabel.append(symbol);
+      }
+      if (legend.icon) {
+        const icon = document.createElement("span");
+        icon.className = "legend-icon";
+        icon.append(createLegendIcon(legend.icon));
+        keyLabel.append(icon);
       }
       keyTop.append(keyLabel);
       key.append(keySide, keyTop);
