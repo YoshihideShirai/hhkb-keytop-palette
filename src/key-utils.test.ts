@@ -20,7 +20,7 @@ const snowProduct = { colorName: "雪" } as ProductAppearance;
 describe("key label helpers", () => {
   it("uses the first line as the normalized key label", () => {
     expect(normalizeLabel("1\n!")).toBe("1");
-    expect(normalizeLabel("半角\n/全角")).toBe("半角");
+    expect(normalizeLabel("半角/全角")).toBe("半角");
   });
 
   it("classifies number and alphabet keys", () => {
@@ -52,6 +52,8 @@ describe("appearance helpers", () => {
     expect(isWhiteProduct(snowProduct)).toBe(false);
     expect(isWhiteProductSpecialKey("Esc", "")).toBe(true);
     expect(isWhiteProductSpecialKey("", "space")).toBe(true);
+    expect(isWhiteProductSpecialKey("半角/全角", "")).toBe(true);
+    expect(isWhiteProductSpecialKey("Kana かな", "")).toBe(true);
     expect(isWhiteProductSpecialKey("A", "")).toBe(false);
   });
 

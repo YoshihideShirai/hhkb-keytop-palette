@@ -82,6 +82,7 @@ main { width: min(1320px, calc(100% - 40px)); margin: auto; }
 .legend-snow-center .legend-secondary, .legend-anniversary-center .legend-secondary, .legend-studio-center .legend-secondary { top: 12%; left: 50%; transform: translateX(-50%); font-size: .72em; }
 .keyboard-us.legend-standard-corner .legend-secondary { font-size: .84em; }
 .keyboard-jis.legend-standard-corner .legend-secondary { font-size: .78em; }
+.key.jis-input-mode { font-size: clamp(5px, .55vw, 7px); }
 .keyboard-jis.legend-snow-center .legend-secondary, .keyboard-jis.legend-anniversary-center .legend-secondary, .keyboard-jis.legend-studio-center .legend-secondary { top: 8%; font-size: .68em; }
 .legend-symbol { font-size: 1.25em; }
 .legend-icon { top: -.5px; left: -.5px; width: 1.55em; height: 1.55em; line-height: 0; color: var(--legend-color); }

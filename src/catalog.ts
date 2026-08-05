@@ -1,7 +1,7 @@
 import { bodyColor, type ColorOption, type KeyDefinition, type KeyIcon, type KeyLegend, type Layout, type LayoutName } from "./types";
 
-function key(primary: string, width: number, className?: string, secondary?: string): KeyDefinition {
-  return [{ primary, ...(secondary ? { secondary } : {}) }, width, className];
+function key(primary: string, width: number, className?: string, secondary?: string, accessibleLabel?: string): KeyDefinition {
+  return [{ primary, ...(secondary ? { secondary } : {}), ...(accessibleLabel ? { accessibleLabel } : {}) }, width, className];
 }
 
 function icon(icon: KeyIcon, accessibleLabel: string, width: number, className?: string): KeyDefinition {
@@ -54,7 +54,7 @@ export const layouts: Record<LayoutName, Layout> = {
       [key("Tab", 1.5), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), key("@", 1, undefined, "`"), key("[", 1, undefined, "{"), [blankLegend, 0, "spacer"], key("Enter", 1.5, "jis-enter")],
       [key("Control", 1.75), ..."ASDFGHJKL".split("").map((label) => key(label, 1)), key(";", 1, undefined, "+"), key(":", 1, undefined, "*"), key("]", 1, undefined, "}")],
       [key("Shift", 2), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("\\", 1, undefined, "_"), [blankLegend, 0, "spacer"], icon("arrow-up", "↑", 1, "arrow"), key("Shift", 1)],
-      [key("Fn", 1), [blankLegend, .25, "spacer"], key("半角", 1, undefined, "全角"), icon("diamond", "◇", 1), key("Alt", 1), key("無変換", 1), [blankLegend, 2.5, "space"], key("変換", 1), key("かな", 1), key("Alt", 1), key("Fn", 1), [blankLegend, .25, "spacer"], icon("arrow-left", "←", 1, "arrow"), icon("arrow-down", "↓", 1, "arrow"), icon("arrow-right", "→", 1, "arrow")],
+      [key("Fn", 1), [blankLegend, .25, "spacer"], key("半角/全角", 1, "jis-input-mode"), icon("diamond", "◇", 1), key("Alt", 1), key("無変換", 1), [blankLegend, 2.5, "space"], key("変換", 1), key("Kana", 1, undefined, "かな", "かな"), key("Alt", 1), key("Fn", 1), [blankLegend, .25, "spacer"], icon("arrow-left", "←", 1, "arrow"), icon("arrow-down", "↓", 1, "arrow"), icon("arrow-right", "→", 1, "arrow")],
     ],
   },
 };
