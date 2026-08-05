@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <symbol id="legend-diamond" viewBox="0 0 24 24">
+      <polygon points="12 3 21 12 12 21 3 12" />
+    </symbol>
+    <symbol id="legend-arrow-up" viewBox="0 0 24 24">
+      <path d="M12 20V4" />
+      <path d="M5 11l7-7 7 7" />
+    </symbol>
+    <symbol id="legend-arrow-down" viewBox="0 0 24 24">
+      <path d="M12 4v16" />
+      <path d="M5 13l7 7 7-7" />
+    </symbol>
+    <symbol id="legend-arrow-left" viewBox="0 0 24 24">
+      <path d="M20 12H4" />
+      <path d="M11 5l-7 7 7 7" />
+    </symbol>
+    <symbol id="legend-arrow-right" viewBox="0 0 24 24">
+      <path d="M4 12h16" />
+      <path d="M13 5l7 7-7 7" />
+    </symbol>
+  </defs>
+</svg>
