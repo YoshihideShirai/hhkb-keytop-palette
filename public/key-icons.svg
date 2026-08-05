@@ -19,5 +19,21 @@
       <path d="M4 12h16" />
       <path d="M13 5l7 7-7 7" />
     </symbol>
+    <symbol id="legend-input-mode" viewBox="0 0 24 24">
+      <path d="M6 5h12" />
+      <path d="M6 19h12" />
+      <path d="M12 5v14" />
+      <path d="M8 9l-3 3 3 3" />
+      <path d="M16 9l3 3-3 3" />
+    </symbol>
+    <symbol id="legend-non-convert" viewBox="0 0 24 24">
+      <path d="M4 15c2.4 0 2.4-6 4.8-6s2.4 6 4.8 6 2.4-6 4.8-6" />
+      <path d="M4 19h16" />
+    </symbol>
+    <symbol id="legend-convert" viewBox="0 0 24 24">
+      <path d="M18.5 8.5A7 7 0 1 0 19 16" />
+      <path d="M19 4v5h-5" />
+      <path d="M15 16h5v5" />
+    </symbol>
   </defs>
 </svg>

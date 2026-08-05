@@ -1,4 +1,12 @@
-export type KeyIcon = "diamond" | "arrow-up" | "arrow-down" | "arrow-left" | "arrow-right";
+export type KeyIcon =
+  | "diamond"
+  | "arrow-up"
+  | "arrow-down"
+  | "arrow-left"
+  | "arrow-right"
+  | "input-mode"
+  | "non-convert"
+  | "convert";
 
 export interface KeyLegend {
   primary: string;
