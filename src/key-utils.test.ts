@@ -53,7 +53,7 @@ describe("appearance helpers", () => {
     expect(isWhiteProductSpecialKey("Esc", "")).toBe(true);
     expect(isWhiteProductSpecialKey("", "space")).toBe(true);
     expect(isWhiteProductSpecialKey("半角/全角", "")).toBe(true);
-    expect(isWhiteProductSpecialKey("Kana かな", "")).toBe(true);
+    expect(isWhiteProductSpecialKey("Kana", "")).toBe(true);
     expect(isWhiteProductSpecialKey("A", "")).toBe(false);
   });
 

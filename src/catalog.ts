@@ -44,7 +44,7 @@ export const layouts: Record<LayoutName, Layout> = {
       [key("Tab", 1.5), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), key("[", 1, undefined, "{"), key("]", 1, undefined, "}"), key("Delete", 1.5)],
       [key("Control", 1.75), ..."ASDFGHJKL".split("").map((label) => key(label, 1)), key(";", 1, undefined, ":"), key("'", 1, undefined, '"'), key("Return", 2.25)],
       [key("Shift", 2.25), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("Shift", 2.75)],
-      [key("Fn", 1.25), key("Alt", 1.25), icon("diamond", "◇", 1.25), [blankLegend, 6, "space"], icon("diamond", "◇", 1.25), key("Alt", 1.25), key("Fn", 1.25)],
+      [key("Fn", 1.25), key("Alt", 1.25, undefined, "Opt"), icon("diamond", "◇", 1.25), [blankLegend, 6, "space"], icon("diamond", "◇", 1.25), key("Alt", 1.25, undefined, "Opt"), key("Fn", 1.25)],
     ],
   },
   jis: {
@@ -54,7 +54,7 @@ export const layouts: Record<LayoutName, Layout> = {
       [key("Tab", 1.5), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), key("@", 1, undefined, "`"), key("[", 1, undefined, "{"), [blankLegend, 0, "spacer"], key("Enter", 1.5, "jis-enter")],
       [key("Control", 1.75), ..."ASDFGHJKL".split("").map((label) => key(label, 1)), key(";", 1, undefined, "+"), key(":", 1, undefined, "*"), key("]", 1, undefined, "}")],
       [key("Shift", 2), ..."ZXCVBNM".split("").map((label) => key(label, 1)), key(",", 1, undefined, "<"), key(".", 1, undefined, ">"), key("/", 1, undefined, "?"), key("\\", 1, undefined, "_"), [blankLegend, 0, "spacer"], icon("arrow-up", "↑", 1, "arrow"), key("Shift", 1)],
-      [key("Fn", 1), [blankLegend, .25, "spacer"], key("半角/全角", 1, "jis-input-mode"), icon("diamond", "◇", 1), key("Alt", 1), key("無変換", 1), [blankLegend, 2.5, "space"], key("変換", 1), key("Kana", 1, undefined, "かな", "かな"), key("Alt", 1), key("Fn", 1), [blankLegend, .25, "spacer"], icon("arrow-left", "←", 1, "arrow"), icon("arrow-down", "↓", 1, "arrow"), icon("arrow-right", "→", 1, "arrow")],
+      [key("Fn", 1), [blankLegend, .25, "spacer"], key("半角/全角", 1, "jis-input-mode"), icon("diamond", "◇", 1), key("Alt", 1, undefined, "Opt"), key("無変換", 1), [blankLegend, 2.5, "space"], key("変換", 1), key("Kana", 1, undefined, undefined, "かな"), key("Alt", 1, undefined, "Opt"), key("Fn", 1), [blankLegend, .25, "spacer"], icon("arrow-left", "←", 1, "arrow"), icon("arrow-down", "↓", 1, "arrow"), icon("arrow-right", "→", 1, "arrow")],
     ],
   },
 };
