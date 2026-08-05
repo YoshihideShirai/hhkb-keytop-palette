@@ -11,6 +11,7 @@ import {
   type CompactSavedState,
   type KeyContext,
   type KeyDefinition,
+  type KeyIcon,
   type KeyLegend,
   type LayoutName,
   type ProductAppearance,
@@ -88,7 +89,21 @@ function currentKeyContexts(): KeyContext[] {
 }
 
 function accessibleLegend(legend: KeyLegend): string {
-  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol].filter(Boolean).join(" ");
+  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol, legend.icon].filter(Boolean).join(" ");
+}
+
+function createLegendIcon(icon: KeyIcon): SVGSVGElement {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+
+  svg.setAttribute("class", "legend-icon-svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("focusable", "false");
+  svg.setAttribute("aria-hidden", "true");
+  use.setAttribute("href", `${new URL("key-icons.svg", document.baseURI).toString()}#legend-${icon}`);
+  svg.append(use);
+
+  return svg;
 }
 
 function defaultColorForKey({ label, className }: Pick<KeyContext, "label" | "className">): string {
@@ -155,6 +170,12 @@ function renderKeyboard(): void {
         symbol.className = "legend-symbol";
         symbol.textContent = legend.symbol;
         keyLabel.append(symbol);
+      }
+      if (legend.icon) {
+        const icon = document.createElement("span");
+        icon.className = "legend-icon";
+        icon.append(createLegendIcon(legend.icon));
+        keyLabel.append(icon);
       }
       keyTop.append(keyLabel);
       key.append(keySide, keyTop);

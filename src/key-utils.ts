@@ -1,7 +1,7 @@
 import type { ProductAppearance } from "./types";
 
 export function normalizeLabel(label: string): string {
-  return label.split("\n")[0];
+  return label.split(/[\n\s/]+/)[0];
 }
 
 export function isNumberKey(label: string): boolean {
@@ -41,7 +41,7 @@ export function isJisHeartKey(rowIndex: number, label: string): boolean {
     ["Y", "U", "I", "O", "P", "@"],
     ["H", "J", "K", "L", ";"],
     ["M", ",", "."],
-    ["かな"],
+    ["Kana", "かな"],
   ];
   return heartRows[rowIndex]?.includes(normalized) ?? false;
 }
@@ -65,6 +65,8 @@ export function isWhiteProductSpecialKey(label: string, className: string): bool
     "Alt",
     "◇",
     "半角",
+    "半角/全角",
+    "Kana",
     "無変換",
     "変換",
     "かな",
