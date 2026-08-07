@@ -195,7 +195,8 @@ function renderKeyboard(): void {
       keyTop.append(keyLabel);
       key.append(keySide, keyTop);
       key.addEventListener("click", () => {
-        keyColors[currentIndex] = resolveColor(selected.value, keyContext);
+        const selectedColor = resolveColor(selected.value, keyContext);
+        keyColors[currentIndex] = keyColors[currentIndex] === selectedColor ? defaultColorForKey(keyContext) : selectedColor;
         syncUserChangeToUrl();
         renderKeyboard();
       });
