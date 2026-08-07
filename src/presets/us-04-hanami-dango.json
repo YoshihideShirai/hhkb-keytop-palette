@@ -1,6 +1,6 @@
 {
   "name": "花見三色団子",
-  "sub": "桜 / 山葵 / 蒲公英",
+  "sub": "英語配列 / HYBRID 白",
   "layout": "us",
   "rows": [
     {
@@ -22,21 +22,21 @@
         "` ~ Del"
       ],
       "colors": [
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__"
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#b8c58a",
+        "#b8c58a",
+        "#b8c58a",
+        "#b8c58a",
+        "#b8c58a"
       ]
     },
     {
@@ -57,20 +57,20 @@
         "Delete BS"
       ],
       "colors": [
-        "__body_color__",
         "#f1c6c9",
         "#f1c6c9",
         "#f1c6c9",
         "#f1c6c9",
-        "#f1c6c9",
-        "#f1c6c9",
-        "#f1c6c9",
-        "#f1c6c9",
-        "#f1c6c9",
-        "#f1c6c9",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__"
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#b8c58a",
+        "#b8c58a",
+        "#b8c58a",
+        "#b8c58a"
       ]
     },
     {
@@ -90,19 +90,19 @@
         "Return Enter"
       ],
       "colors": [
-        "__body_color__",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
         "#b8c58a",
         "#b8c58a",
-        "#b8c58a",
-        "#b8c58a",
-        "#b8c58a",
-        "#b8c58a",
-        "#b8c58a",
-        "#b8c58a",
-        "#b8c58a",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__"
+        "#b8c58a"
       ]
     },
     {
@@ -121,18 +121,18 @@
         "Shift"
       ],
       "colors": [
-        "__body_color__",
-        "#f0c94b",
-        "#f0c94b",
-        "#f0c94b",
-        "#f0c94b",
-        "#f0c94b",
-        "#f0c94b",
-        "#f0c94b",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__"
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#f8f7f2",
+        "#b8c58a",
+        "#b8c58a",
+        "#b8c58a"
       ]
     },
     {
@@ -146,13 +146,13 @@
         "Fn"
       ],
       "colors": [
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__"
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f1c6c9",
+        "#f8f7f2",
+        "#b8c58a",
+        "#b8c58a",
+        "#b8c58a"
       ]
     }
   ]
