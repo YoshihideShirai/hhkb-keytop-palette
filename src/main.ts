@@ -2,6 +2,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 import { colors, keytop, layouts } from "./catalog";
 import { isWhiteProduct, isWhiteProductSpecialKey, textColor } from "./key-utils";
+import type { FixedPresetDefinition } from "./preset-format";
 import { presetsByLayout } from "./presets";
 import { productAppearances, productSeries } from "./products";
 import {
@@ -33,7 +34,10 @@ const customColor = queryElement<HTMLInputElement>("#customColor");
 const customColorValue = queryElement<HTMLOutputElement>("#customColorValue");
 const resetButton = queryElement<HTMLButtonElement>("#resetButton");
 const saveButton = queryElement<HTMLButtonElement>("#saveButton");
+const loadButton = queryElement<HTMLButtonElement>("#loadButton");
 const downloadPresetButton = queryElement<HTMLButtonElement>("#downloadPresetButton");
+const uploadPresetButton = queryElement<HTMLButtonElement>("#uploadPresetButton");
+const uploadPresetInput = queryElement<HTMLInputElement>("#uploadPresetInput");
 const xShareButton = queryElement<HTMLButtonElement>("#xShareButton");
 const shareButton = queryElement<HTMLButtonElement>("#shareButton");
 const toastElement = queryElement<HTMLDivElement>("#toast");
@@ -303,6 +307,41 @@ function save(): boolean {
   }
 }
 
+function renderLayoutControls(): void {
+  document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
+    const active = button.dataset.layout === currentLayout;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function applyStoredDesign(stored: SavedState | string[] | null): boolean {
+  let nextLayout: LayoutName = "us";
+  let nextProduct: ProductId = defaultProduct;
+  let nextSavedDesigns: Partial<Record<LayoutName, string[]>> = {};
+
+  if (Array.isArray(stored)) {
+    nextSavedDesigns.us = stored;
+  } else if (stored && typeof stored === "object") {
+    nextLayout = isLayoutName(stored.layout) ? stored.layout : "us";
+    nextProduct = isProductId(stored.product) ? stored.product : defaultProduct;
+    nextSavedDesigns = stored.designs || (Array.isArray(stored.colors) ? { [nextLayout]: stored.colors } : {});
+  } else {
+    return false;
+  }
+
+  const values = nextSavedDesigns[nextLayout];
+  if (!Array.isArray(values) || values.length !== layouts[nextLayout].rows.flat().length || values.some((value) => typeof value !== "string")) {
+    return false;
+  }
+
+  currentLayout = nextLayout;
+  currentProduct = nextProduct;
+  savedDesigns = nextSavedDesigns;
+  keyColors = values;
+  return true;
+}
+
 function rowsFromCurrentDesign(): string[][] {
   let index = 0;
   return currentRows().map((row) => row.map(() => keyColors[index++]));
@@ -342,6 +381,82 @@ function downloadPresetFile(): void {
   link.click();
   URL.revokeObjectURL(url);
   toast("プリセットファイルをダウンロードしました");
+}
+
+function isColorDefinition(value: unknown): value is ColorDefinition {
+  return value === bodyColor || (typeof value === "string" && /^#[\da-f]{6}$/i.test(value));
+}
+
+function parseUploadedPreset(value: unknown): FixedPresetDefinition | null {
+  if (!value || typeof value !== "object") return null;
+
+  const preset = value as Partial<FixedPresetDefinition>;
+  if (typeof preset.name !== "string" || !isLayoutName(preset.layout) || !Array.isArray(preset.rows)) {
+    return null;
+  }
+
+  const layoutRows = layouts[preset.layout].rows;
+  if (preset.rows.length !== layoutRows.length) {
+    return null;
+  }
+
+  const rows = preset.rows.map((row, rowIndex) => {
+    if (!row || typeof row !== "object" || !Array.isArray(row.colors)) {
+      return null;
+    }
+
+    if (row.colors.length !== layoutRows[rowIndex].length || !row.colors.every(isColorDefinition)) {
+      return null;
+    }
+
+    return {
+      keys: Array.isArray(row.keys) && row.keys.every((key: unknown) => typeof key === "string") ? row.keys : undefined,
+      colors: row.colors,
+    };
+  });
+
+  if (rows.some((row) => row === null)) {
+    return null;
+  }
+
+  return {
+    name: preset.name.trim() || "アップロードした配色",
+    sub: typeof preset.sub === "string" ? preset.sub : "アップロードしたプリセット",
+    layout: preset.layout,
+    rows: rows as FixedPresetDefinition["rows"],
+  };
+}
+
+function applyUploadedPreset(preset: FixedPresetDefinition): void {
+  savedDesigns[currentLayout] = keyColors;
+  currentLayout = preset.layout;
+
+  const contexts = currentKeyContexts();
+  keyColors = preset.rows.flatMap((row) => row.colors).map((color, index) => resolveColor(color, contexts[index]));
+  savedDesigns[currentLayout] = keyColors;
+
+  renderLayoutControls();
+
+  renderPresets();
+  renderKeyboard();
+  syncUserChangeToUrl();
+  toast(`${preset.name} をアップロードしました`);
+}
+
+async function uploadPresetFile(file: File | undefined): Promise<void> {
+  if (!file) return;
+
+  try {
+    const preset = parseUploadedPreset(JSON.parse(await file.text()));
+    if (!preset) {
+      toast("プリセットファイルを読み込めません");
+      return;
+    }
+
+    applyUploadedPreset(preset);
+  } catch {
+    toast("プリセットファイルを読み込めません");
+  }
 }
 
 function toBase64Url(value: string): string {
@@ -437,18 +552,28 @@ function load(): void {
       ? deserializeDesignParam(query)
       : JSON.parse(localStorage.getItem("hhkb-keytop-palette") || "null") as SavedState | string[] | null;
 
-    if (Array.isArray(stored)) {
-      savedDesigns.us = stored;
-    } else if (stored && typeof stored === "object") {
-      currentLayout = isLayoutName(stored.layout) ? stored.layout : "us";
-      currentProduct = isProductId(stored.product) ? stored.product : defaultProduct;
-      savedDesigns = stored.designs || { [currentLayout]: stored.colors };
+    if (!applyStoredDesign(stored)) {
+      keyColors = defaultColors();
     }
-
-    const values = savedDesigns[currentLayout];
-    keyColors = Array.isArray(values) && values.length === currentRows().flat().length ? values : defaultColors();
   } catch {
     keyColors = defaultColors();
+  }
+}
+
+function loadBrowserSavedDesign(): void {
+  try {
+    const stored = JSON.parse(localStorage.getItem("hhkb-keytop-palette") || "null") as SavedState | string[] | null;
+    if (!applyStoredDesign(stored)) {
+      toast("ブラウザ保存したデザインがありません");
+      return;
+    }
+
+    renderLayoutControls();
+    selectProduct(currentProduct);
+    syncUserChangeToUrl();
+    toast("ブラウザ保存を読み込みました");
+  } catch {
+    toast("ブラウザ保存を読み込めません");
   }
 }
 
@@ -522,11 +647,7 @@ function selectLayout(layout: string | undefined): void {
   const saved = savedDesigns[currentLayout];
   keyColors = Array.isArray(saved) && saved.length === currentRows().flat().length ? saved : defaultColors();
 
-  document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
-    const active = button.dataset.layout === currentLayout;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
+  renderLayoutControls();
 
   renderPresets();
   renderKeyboard();
@@ -553,10 +674,21 @@ resetButton.addEventListener("click", () => {
 
 saveButton.addEventListener("click", () => {
   const persisted = save();
-  toast(persisted ? "デザインを保存しました" : "保存は利用できません");
+  toast(persisted ? "ブラウザに保存しました" : "ブラウザ保存は利用できません");
 });
 
+loadButton.addEventListener("click", loadBrowserSavedDesign);
+
 downloadPresetButton.addEventListener("click", downloadPresetFile);
+
+uploadPresetButton.addEventListener("click", () => {
+  uploadPresetInput.click();
+});
+
+uploadPresetInput.addEventListener("change", () => {
+  void uploadPresetFile(uploadPresetInput.files?.[0]);
+  uploadPresetInput.value = "";
+});
 
 xShareButton.addEventListener("click", () => {
   const intentUrl = new URL("https://twitter.com/intent/tweet");
@@ -579,10 +711,6 @@ shareButton.addEventListener("click", async () => {
 
 load();
 selectProduct(currentProduct);
-document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
-  const active = button.dataset.layout === currentLayout;
-  button.classList.toggle("active", active);
-  button.setAttribute("aria-pressed", String(active));
-});
+renderLayoutControls();
 chooseColor(selected);
 renderKeyboard();
