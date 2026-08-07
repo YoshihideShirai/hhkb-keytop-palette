@@ -4,13 +4,14 @@ export type KeyIcon =
   | "arrow-down"
   | "arrow-left"
   | "arrow-right"
-  | "input-mode"
+  | "hhkb-mark"
   | "non-convert"
   | "convert";
 
 export interface KeyLegend {
   primary: string;
   secondary?: string;
+  front?: string;
   /** Non-textual or uncommon marks that should be rendered as text. */
   symbol?: string;
   /** Icon identifier for non-textual HHKB legends rendered with SVG. */
