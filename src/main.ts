@@ -40,9 +40,48 @@ const uploadPresetButton = queryElement<HTMLButtonElement>("#uploadPresetButton"
 const uploadPresetInput = queryElement<HTMLInputElement>("#uploadPresetInput");
 const xShareButton = queryElement<HTMLButtonElement>("#xShareButton");
 const shareButton = queryElement<HTMLButtonElement>("#shareButton");
+const menuButton = queryElement<HTMLButtonElement>("#menuButton");
+const headerMenu = queryElement<HTMLDivElement>("#headerMenu");
 const toastElement = queryElement<HTMLDivElement>("#toast");
 
 let selected = colors[0];
+
+const mobileHeader = window.matchMedia("(max-width: 600px)");
+
+function setHeaderMenuOpen(open: boolean, restoreFocus = false) {
+  const shouldOpen = mobileHeader.matches && open;
+  menuButton.setAttribute("aria-expanded", String(shouldOpen));
+  headerMenu.hidden = mobileHeader.matches ? !shouldOpen : false;
+
+  if (shouldOpen) {
+    headerMenu.querySelector<HTMLElement>("button, a[href]")?.focus();
+  } else if (restoreFocus && mobileHeader.matches) {
+    menuButton.focus();
+  }
+}
+
+menuButton.addEventListener("click", () => {
+  setHeaderMenuOpen(menuButton.getAttribute("aria-expanded") !== "true");
+});
+
+headerMenu.addEventListener("click", (event) => {
+  if (event.target instanceof Element && event.target.closest("button, a[href]")) setHeaderMenuOpen(false, true);
+});
+
+document.addEventListener("click", (event) => {
+  if (menuButton.getAttribute("aria-expanded") === "true" && event.target instanceof Element && !event.target.closest(".header-actions")) {
+    setHeaderMenuOpen(false, true);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
+    setHeaderMenuOpen(false, true);
+  }
+});
+
+mobileHeader.addEventListener("change", () => setHeaderMenuOpen(false));
+setHeaderMenuOpen(false);
 let keyColors: string[] = [];
 let currentLayout: LayoutName = "us";
 let currentProduct: ProductId = "hybrid-type-s-white";
