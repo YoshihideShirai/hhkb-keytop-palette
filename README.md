@@ -44,4 +44,10 @@ npm run dev
 
 `main` ブランチへpushすると、GitHub Actionsが `npm ci` と `npm run build` を実行し、生成された `dist` をGitHub Pagesへデプロイします。初回のみリポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定してください。
 
-このプロジェクトは環境変数を必要としないため、GitHub Pagesのプロジェクトサイト（サブパス）でもそのまま動作します。
+基本機能は環境変数なしで動作するため、GitHub Pagesのプロジェクトサイト（サブパス）でもそのまま公開できます。
+
+## Google Analytics
+
+Google Analytics 4でアクセスを記録する場合は、GA4の測定ID（例: `G-XXXXXXXXXX`）をGitHubリポジトリの **Settings → Secrets and variables → Actions → Variables** に `VITE_GA_MEASUREMENT_ID` として登録してください。Secretとして同名で登録しても動作します。
+
+`main` ブランチへpushすると、GitHub Pagesのビルド時に測定IDが渡され、公開サイトでGoogle Analyticsの計測タグが読み込まれます。未設定の場合、計測タグは読み込まれません。
