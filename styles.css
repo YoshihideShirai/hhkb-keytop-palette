@@ -57,16 +57,24 @@ main { width: min(1320px, calc(100% - 40px)); margin: auto; }
 .keyboard-hybrid::before { content: ""; position: absolute; z-index: 0; left: 7.5%; right: 7.5%; top: calc(var(--pitch) * -.34); height: calc(var(--pitch) * .52); border: 1px solid color-mix(in srgb, var(--case-color, #d2cfc5), #000 19%); border-bottom: 0; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, color-mix(in srgb, var(--case-color, #d2cfc5), #fff 11%), color-mix(in srgb, var(--case-color, #d2cfc5), #000 7%)); box-shadow: inset 0 2px 0 rgba(255,255,255,.22), inset 0 -6px 0 rgba(0,0,0,.1), 0 -1px 0 rgba(255,255,255,.12); }
 .keyboard-us.keyboard-product-hybrid-type-s-white,
 .keyboard-us.keyboard-product-hybrid-type-s-sumi,
-.keyboard-us.keyboard-product-hybrid-type-s-snow { --case-padding-inline: calc(var(--pitch) * .22); --case-padding-top: calc(var(--pitch) * .64); --case-padding-bottom: calc(var(--pitch) * .18); --case-front-depth: calc(var(--pitch) * .16); border-radius: 2px 2px 5px 5px / 2px 2px 6px 6px; box-shadow: inset 0 1px 0 rgba(255,255,255,.3), inset 0 -5px 7px rgba(0,0,0,.07), 0 1px 0 color-mix(in srgb, var(--case-color, #d2cfc5), #000 22%), 0 10px 18px rgba(36,34,28,.1), 0 24px 38px rgba(36,34,28,.13); transform: perspective(1200px) rotateX(1.1deg); }
+.keyboard-us.keyboard-product-hybrid-type-s-snow,
+.keyboard-us.keyboard-product-hybrid-white,
+.keyboard-us.keyboard-product-hybrid-sumi { --case-padding-inline: calc(var(--pitch) * .22); --case-padding-top: calc(var(--pitch) * .64); --case-padding-bottom: calc(var(--pitch) * .18); --case-front-depth: calc(var(--pitch) * .16); border-radius: 2px 2px 5px 5px / 2px 2px 6px 6px; box-shadow: inset 0 1px 0 rgba(255,255,255,.3), inset 0 -5px 7px rgba(0,0,0,.07), 0 1px 0 color-mix(in srgb, var(--case-color, #d2cfc5), #000 22%), 0 10px 18px rgba(36,34,28,.1), 0 24px 38px rgba(36,34,28,.13); transform: perspective(1200px) rotateX(1.1deg); }
 .keyboard-us.keyboard-product-hybrid-type-s-white::after,
 .keyboard-us.keyboard-product-hybrid-type-s-sumi::after,
-.keyboard-us.keyboard-product-hybrid-type-s-snow::after { inset: calc(var(--case-padding-top) * .48) calc(var(--case-padding-inline) * .32) calc((var(--case-padding-bottom) + var(--case-front-depth)) * .5); border-radius: 2px 2px 4px 4px; background: color-mix(in srgb, var(--case-color, #d2cfc5), #000 11%); box-shadow: inset 0 1px 2px rgba(0,0,0,.11), inset 0 -1px 0 rgba(255,255,255,.08); }
+.keyboard-us.keyboard-product-hybrid-type-s-snow::after,
+.keyboard-us.keyboard-product-hybrid-white::after,
+.keyboard-us.keyboard-product-hybrid-sumi::after { inset: calc(var(--case-padding-top) * .48) calc(var(--case-padding-inline) * .32) calc((var(--case-padding-bottom) + var(--case-front-depth)) * .5); border-radius: 2px 2px 4px 4px; background: color-mix(in srgb, var(--case-color, #d2cfc5), #000 11%); box-shadow: inset 0 1px 2px rgba(0,0,0,.11), inset 0 -1px 0 rgba(255,255,255,.08); }
 .keyboard-us.keyboard-product-hybrid-type-s-white::before,
 .keyboard-us.keyboard-product-hybrid-type-s-sumi::before,
-.keyboard-us.keyboard-product-hybrid-type-s-snow::before { left: 10.5%; right: 10.5%; top: calc(var(--pitch) * -.22); height: calc(var(--pitch) * .3); border-radius: 3px 3px 1px 1px; }
+.keyboard-us.keyboard-product-hybrid-type-s-snow::before,
+.keyboard-us.keyboard-product-hybrid-white::before,
+.keyboard-us.keyboard-product-hybrid-sumi::before { left: 10.5%; right: 10.5%; top: calc(var(--pitch) * -.22); height: calc(var(--pitch) * .3); border-radius: 3px 3px 1px 1px; }
 .keyboard-us.keyboard-product-hybrid-type-s-white .keyboard-badge,
 .keyboard-us.keyboard-product-hybrid-type-s-sumi .keyboard-badge,
-.keyboard-us.keyboard-product-hybrid-type-s-snow .keyboard-badge { top: calc(var(--pitch) * .14); left: calc(var(--pitch) * .2); font-size: 7px; letter-spacing: .02em; opacity: .64; }
+.keyboard-us.keyboard-product-hybrid-type-s-snow .keyboard-badge,
+.keyboard-us.keyboard-product-hybrid-white .keyboard-badge,
+.keyboard-us.keyboard-product-hybrid-sumi .keyboard-badge { top: calc(var(--pitch) * .14); left: calc(var(--pitch) * .2); font-size: 7px; letter-spacing: .02em; opacity: .64; }
 .keyboard-us.keyboard-product-hybrid-type-s-white .keyboard-grade-badge,
 .keyboard-us.keyboard-product-hybrid-type-s-sumi .keyboard-grade-badge,
 .keyboard-us.keyboard-product-hybrid-type-s-snow .keyboard-grade-badge { top: calc(var(--pitch) * .14); right: calc(var(--pitch) * .2); font-size: 7px; opacity: .64; }
