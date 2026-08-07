@@ -118,41 +118,39 @@
         ", < End",
         ". > ↓",
         "/ ?",
-        "Shift"
-      ],
-      "colors": [
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__"
-      ]
-    },
-    {
-      "keys": [
-        "Fn",
-        "Alt Opt",
-        "◇",
-        "スペース",
-        "◇",
-        "Alt Opt",
+        "Shift",
         "Fn"
       ],
       "colors": [
-        "#f0c94b",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
         "__body_color__",
         "__body_color__",
         "__body_color__",
         "__body_color__",
         "__body_color__",
         "#f0c94b"
+      ]
+    },
+    {
+      "keys": [
+        "Alt Opt",
+        "◇",
+        "スペース",
+        "◇",
+        "Alt Opt"
+      ],
+      "colors": [
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__"
       ]
     }
   ]

@@ -118,31 +118,7 @@
         ", < End",
         ". > ↓",
         "/ ?",
-        "Shift"
-      ],
-      "colors": [
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__",
-        "#c8b2d8",
-        "#c8b2d8",
-        "#c8b2d8",
-        "__body_color__",
-        "__body_color__",
-        "__body_color__"
-      ]
-    },
-    {
-      "keys": [
-        "Fn",
-        "Alt Opt",
-        "◇",
-        "スペース",
-        "◇",
-        "Alt Opt",
+        "Shift",
         "Fn"
       ],
       "colors": [
@@ -152,7 +128,29 @@
         "__body_color__",
         "__body_color__",
         "__body_color__",
+        "#c8b2d8",
+        "#c8b2d8",
+        "#c8b2d8",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
         "#a9d2e8"
+      ]
+    },
+    {
+      "keys": [
+        "Alt Opt",
+        "◇",
+        "スペース",
+        "◇",
+        "Alt Opt"
+      ],
+      "colors": [
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__",
+        "__body_color__"
       ]
     }
   ]
