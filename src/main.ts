@@ -2,6 +2,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 import { colors, keytop, layouts } from "./catalog";
 import { isWhiteProduct, isWhiteProductSpecialKey, textColor } from "./key-utils";
+import type { FixedPresetDefinition } from "./preset-format";
 import { presetsByLayout } from "./presets";
 import { productAppearances, productSeries } from "./products";
 import {
@@ -34,6 +35,8 @@ const customColorValue = queryElement<HTMLOutputElement>("#customColorValue");
 const resetButton = queryElement<HTMLButtonElement>("#resetButton");
 const saveButton = queryElement<HTMLButtonElement>("#saveButton");
 const downloadPresetButton = queryElement<HTMLButtonElement>("#downloadPresetButton");
+const uploadPresetButton = queryElement<HTMLButtonElement>("#uploadPresetButton");
+const uploadPresetInput = queryElement<HTMLInputElement>("#uploadPresetInput");
 const xShareButton = queryElement<HTMLButtonElement>("#xShareButton");
 const shareButton = queryElement<HTMLButtonElement>("#shareButton");
 const toastElement = queryElement<HTMLDivElement>("#toast");
@@ -344,6 +347,86 @@ function downloadPresetFile(): void {
   toast("プリセットファイルをダウンロードしました");
 }
 
+function isColorDefinition(value: unknown): value is ColorDefinition {
+  return value === bodyColor || (typeof value === "string" && /^#[\da-f]{6}$/i.test(value));
+}
+
+function parseUploadedPreset(value: unknown): FixedPresetDefinition | null {
+  if (!value || typeof value !== "object") return null;
+
+  const preset = value as Partial<FixedPresetDefinition>;
+  if (typeof preset.name !== "string" || !isLayoutName(preset.layout) || !Array.isArray(preset.rows)) {
+    return null;
+  }
+
+  const layoutRows = layouts[preset.layout].rows;
+  if (preset.rows.length !== layoutRows.length) {
+    return null;
+  }
+
+  const rows = preset.rows.map((row, rowIndex) => {
+    if (!row || typeof row !== "object" || !Array.isArray(row.colors)) {
+      return null;
+    }
+
+    if (row.colors.length !== layoutRows[rowIndex].length || !row.colors.every(isColorDefinition)) {
+      return null;
+    }
+
+    return {
+      keys: Array.isArray(row.keys) && row.keys.every((key: unknown) => typeof key === "string") ? row.keys : undefined,
+      colors: row.colors,
+    };
+  });
+
+  if (rows.some((row) => row === null)) {
+    return null;
+  }
+
+  return {
+    name: preset.name.trim() || "アップロードした配色",
+    sub: typeof preset.sub === "string" ? preset.sub : "アップロードしたプリセット",
+    layout: preset.layout,
+    rows: rows as FixedPresetDefinition["rows"],
+  };
+}
+
+function applyUploadedPreset(preset: FixedPresetDefinition): void {
+  savedDesigns[currentLayout] = keyColors;
+  currentLayout = preset.layout;
+
+  const contexts = currentKeyContexts();
+  keyColors = preset.rows.flatMap((row) => row.colors).map((color, index) => resolveColor(color, contexts[index]));
+  savedDesigns[currentLayout] = keyColors;
+
+  document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
+    const active = button.dataset.layout === currentLayout;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  renderPresets();
+  renderKeyboard();
+  syncUserChangeToUrl();
+  toast(`${preset.name} をアップロードしました`);
+}
+
+async function uploadPresetFile(file: File | undefined): Promise<void> {
+  if (!file) return;
+
+  try {
+    const preset = parseUploadedPreset(JSON.parse(await file.text()));
+    if (!preset) {
+      toast("プリセットファイルを読み込めません");
+      return;
+    }
+
+    applyUploadedPreset(preset);
+  } catch {
+    toast("プリセットファイルを読み込めません");
+  }
+}
+
 function toBase64Url(value: string): string {
   return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
@@ -557,6 +640,15 @@ saveButton.addEventListener("click", () => {
 });
 
 downloadPresetButton.addEventListener("click", downloadPresetFile);
+
+uploadPresetButton.addEventListener("click", () => {
+  uploadPresetInput.click();
+});
+
+uploadPresetInput.addEventListener("change", () => {
+  void uploadPresetFile(uploadPresetInput.files?.[0]);
+  uploadPresetInput.value = "";
+});
 
 xShareButton.addEventListener("click", () => {
   const intentUrl = new URL("https://twitter.com/intent/tweet");
