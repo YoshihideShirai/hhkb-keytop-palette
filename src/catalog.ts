@@ -17,8 +17,8 @@ const blankLegend: KeyLegend = { primary: "", accessibleLabel: "スペース" };
 export const colors: ColorOption[] = [
   { name: "本体カラー", value: bodyColor },
   { name: "墨", value: "#3b3b38" },
-  { name: "白", value: "#e7e3d8" },
-  { name: "白 特殊キー", value: "#b7b3a8" },
+  { name: "白", value: "#ded9cf" },
+  { name: "白 特殊キー", value: "#aaa69c" },
   { name: "雪", value: "#f8f7f2" },
   { name: "桜", value: "#f1c6c9" },
   { name: "山葵", value: "#b8c58a" },
@@ -30,8 +30,8 @@ export const colors: ColorOption[] = [
 
 export const keytop = {
   sumi: "#3b3b38",
-  white: "#e7e3d8",
-  whiteSpecial: "#b7b3a8",
+  white: "#ded9cf",
+  whiteSpecial: "#aaa69c",
   snow: "#f8f7f2",
   sakura: "#f1c6c9",
   wasabi: "#b8c58a",

@@ -284,7 +284,7 @@ productSeries.forEach((series) => {
   button.dataset.series = series;
   button.setAttribute("aria-pressed", "false");
   const representative = defaultProductForSeries(series);
-  button.innerHTML = `<span class="product-swatch" style="--color:${representative?.colorValue ?? "#d8d2c5"}"></span><span><strong>${series}</strong><small>${representative?.detail ?? ""}</small></span>`;
+  button.innerHTML = `<span class="product-swatch" style="--color:${representative?.colorValue ?? "#cac4b8"}"></span><span><strong>${series}</strong><small>${representative?.detail ?? ""}</small></span>`;
   button.addEventListener("click", () => selectSeries(series));
   modelSeries.append(button);
 });
