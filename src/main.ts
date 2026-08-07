@@ -33,6 +33,7 @@ const customColor = queryElement<HTMLInputElement>("#customColor");
 const customColorValue = queryElement<HTMLOutputElement>("#customColorValue");
 const resetButton = queryElement<HTMLButtonElement>("#resetButton");
 const saveButton = queryElement<HTMLButtonElement>("#saveButton");
+const downloadPresetButton = queryElement<HTMLButtonElement>("#downloadPresetButton");
 const xShareButton = queryElement<HTMLButtonElement>("#xShareButton");
 const shareButton = queryElement<HTMLButtonElement>("#shareButton");
 const toastElement = queryElement<HTMLDivElement>("#toast");
@@ -302,6 +303,47 @@ function save(): boolean {
   }
 }
 
+function rowsFromCurrentDesign(): string[][] {
+  let index = 0;
+  return currentRows().map((row) => row.map(() => keyColors[index++]));
+}
+
+function serializePresetFile(name: string): string {
+  const sub = `${layouts[currentLayout].name} / ${currentProductAppearance().series} ${currentProductAppearance().colorName}`;
+  const rowLabels = currentRows().map((row) => row.map(([legend]) => accessibleLegend(legend) || "スペース"));
+  const rows = rowsFromCurrentDesign().map((colors, rowIndex) => ({
+    keys: rowLabels[rowIndex],
+    colors,
+  }));
+
+  return `${JSON.stringify({ name, sub, layout: currentLayout, rows }, null, 2)}\n`;
+}
+
+function presetFileName(name: string): string {
+  const slug = name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const timestamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "");
+  return `${slug || "hhkb-preset"}-${timestamp}.json`;
+}
+
+function downloadPresetFile(): void {
+  const name = window.prompt("プリセット名", "作成した配色")?.trim();
+  if (!name) return;
+
+  const blob = new Blob([serializePresetFile(name)], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = presetFileName(name);
+  link.click();
+  URL.revokeObjectURL(url);
+  toast("プリセットファイルをダウンロードしました");
+}
+
 function toBase64Url(value: string): string {
   return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
@@ -511,6 +553,8 @@ saveButton.addEventListener("click", () => {
   const persisted = save();
   toast(persisted ? "デザインを保存しました" : "保存は利用できません");
 });
+
+downloadPresetButton.addEventListener("click", downloadPresetFile);
 
 xShareButton.addEventListener("click", () => {
   const intentUrl = new URL("https://twitter.com/intent/tweet");
