@@ -413,7 +413,9 @@ function updateUrl(): void {
 
 function currentShareUrl(): string {
   updateUrl();
-  return location.href;
+  const url = new URL(location.pathname, location.origin);
+  url.searchParams.set("design", serializeDesignParam());
+  return url.href;
 }
 
 function syncUserChangeToUrl(): void {
