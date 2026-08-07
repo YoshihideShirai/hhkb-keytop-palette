@@ -46,23 +46,109 @@ main { width: min(1320px, calc(100% - 40px)); margin: auto; }
 .step { display: inline-grid; min-width: 24px; height: 24px; place-items: center; border: 1px solid color-mix(in srgb, var(--accent), #fff 64%); border-radius: 999px; background: color-mix(in srgb, var(--accent), #fff 91%); color: var(--accent); font: 800 10px/1 ui-sans-serif, system-ui, sans-serif; }.workspace h2 { margin: 0; font-size: 13px; letter-spacing: .08em; }
 .canvas-toolbar p { margin: 0; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; }
 .selected-swatch { width: 14px; height: 14px; border-radius: 50%; background: #393a37; border: 1px solid rgba(0,0,0,.12); box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--line); }
-.keyboard-stage { container-type: inline-size; min-height: 390px; display: flex; justify-content: center; align-items: center; overflow-x: hidden; margin-top: 22px; padding: 48px 24px 42px; border: 1px solid #eef1f4; border-radius: 14px; background: linear-gradient(180deg, #fff 0%, #fafbfc 48%, #f4f6f8 100%); }
-.keyboard { --pitch: clamp(24px, 4.7vw, 62px); --pitch: clamp(24px, calc(100cqw / 15.84), 62px); --key-gap-ratio: .08; --key-gap: calc(var(--pitch) * var(--key-gap-ratio)); --key-row-gap: var(--key-gap); --key-width: calc(var(--pitch) - var(--key-gap)); --key-height: var(--key-width); --key-bottom-width: .92; --key-top-width: .85; --key-side-inset: 0px; --key-top-inset: calc((var(--key-bottom-width) - var(--key-top-width)) * var(--pitch) / 2); --key-front-depth: calc(var(--pitch) * .065); --case-padding-inline: calc(var(--pitch) * .36); --case-padding-top: calc(var(--pitch) * .55); --case-padding-bottom: calc(var(--pitch) * .48); --case-front-depth: calc(var(--pitch) * .37); --case-depth: calc(var(--pitch) * 5 - var(--key-gap) + var(--case-padding-top) + var(--case-padding-bottom) + var(--case-front-depth)); --key-side-radius: 5px 5px 4px 4px; --key-top-radius: 5px 5px 6px 6px / 5px 5px 8px 8px; position: relative; isolation: isolate; width: max-content; min-width: auto; min-height: var(--case-depth); margin: 0 auto; padding: var(--case-padding-top) var(--case-padding-inline) calc(var(--case-padding-bottom) + var(--case-front-depth)); background: linear-gradient(180deg, color-mix(in srgb, var(--case-color, #d2cfc5), #fff 10%), var(--case-color, #d2cfc5) 54%, color-mix(in srgb, var(--case-color, #d2cfc5), #000 12%)); border: 1px solid color-mix(in srgb, var(--case-color, #d2cfc5), #000 18%); border-radius: 6px 6px 8px 8px; box-shadow: inset 0 2px 0 rgba(255,255,255,.36), inset 0 -3px 4px rgba(0,0,0,.07), 0 7px 12px rgba(36,34,28,.1), 0 20px 34px rgba(36,34,28,.12); transform: perspective(1200px) rotateX(2.5deg); transform-origin: center center; transition: background .2s, padding .2s; }
-.keyboard::after { content: ""; position: absolute; z-index: 0; inset: calc(var(--case-padding-top) * .55) calc(var(--case-padding-inline) * .72) calc((var(--case-padding-bottom) + var(--case-front-depth)) * .65); border-radius: 6px 6px 9px 9px; background: color-mix(in srgb, var(--case-color, #d2cfc5), #000 24%); box-shadow: inset 0 2px 4px rgba(0,0,0,.16), inset 0 -1px 0 rgba(255,255,255,.06); pointer-events: none; }
-.keyboard-badge { position: absolute; z-index: 2; top: 9px; right: 18px; color: color-mix(in srgb, var(--case-color, #d2cfc5), #000 52%); font-size: 8px; font-weight: 800; letter-spacing: .12em; opacity: .62; pointer-events: none; }
-.keyboard-classic, .keyboard-hybrid { border-radius: 6px 6px 8px 8px; }
-.keyboard-hybrid { --case-padding-top: calc(var(--pitch) * .55); }
-.keyboard-hybrid::before { content: ""; position: absolute; z-index: 0; left: 10%; right: 10%; top: -17px; height: 27px; border: 1px solid color-mix(in srgb, var(--case-color, #d2cfc5), #000 18%); border-bottom: 0; border-radius: 7px 7px 3px 3px; background: linear-gradient(180deg, color-mix(in srgb, var(--case-color, #d2cfc5), #fff 5%), color-mix(in srgb, var(--case-color, #d2cfc5), #000 7%)); box-shadow: inset 0 2px 0 rgba(255,255,255,.22), inset 0 -4px 0 rgba(0,0,0,.1); }
-.keyboard-classic { --case-padding-top: calc(var(--pitch) * .55); }
-.keyboard-classic .keyboard-badge { top: 8px; right: 18px; }
+.keyboard-stage { container-type: inline-size; min-height: 390px; display: flex; justify-content: center; align-items: center; overflow-x: hidden; margin-top: 22px; padding: 58px 24px 50px; border: 1px solid #eef1f4; border-radius: 14px; background: radial-gradient(ellipse 82% 46% at 50% 66%, rgba(17,24,39,.09), transparent 64%), linear-gradient(180deg, #fff 0%, #fafbfc 48%, #f4f6f8 100%); }
+.keyboard { --pitch: clamp(24px, 4.7vw, 62px); --pitch: clamp(24px, calc(100cqw / 15.84), 62px); --key-gap-ratio: .075; --key-gap: calc(var(--pitch) * var(--key-gap-ratio)); --key-row-gap: var(--key-gap); --key-width: calc(var(--pitch) - var(--key-gap)); --key-height: var(--key-width); --key-bottom-width: .95; --key-top-width: .78; --key-side-inset: 0px; --key-top-inset: calc((var(--key-bottom-width) - var(--key-top-width)) * var(--pitch) / 2); --key-front-depth: calc(var(--pitch) * .11); --case-padding-inline: calc(var(--pitch) * .46); --case-padding-top: calc(var(--pitch) * .74); --case-padding-bottom: calc(var(--pitch) * .45); --case-front-depth: calc(var(--pitch) * .34); --case-depth: calc(var(--pitch) * 5 - var(--key-gap) + var(--case-padding-top) + var(--case-padding-bottom) + var(--case-front-depth)); --key-side-radius: 6px 6px 5px 5px; --key-top-radius: 4px 4px 6px 6px / 4px 4px 8px 8px; position: relative; isolation: isolate; width: max-content; min-width: auto; min-height: var(--case-depth); margin: 0 auto; padding: var(--case-padding-top) var(--case-padding-inline) calc(var(--case-padding-bottom) + var(--case-front-depth)); background: linear-gradient(180deg, rgba(255,255,255,.16) 0 1px, transparent 1px 100%), linear-gradient(180deg, color-mix(in srgb, var(--case-color, #d2cfc5), #fff 12%) 0%, color-mix(in srgb, var(--case-color, #d2cfc5), #fff 4%) 18%, var(--case-color, #d2cfc5) 66%, color-mix(in srgb, var(--case-color, #d2cfc5), #000 14%) 100%); border: 1px solid color-mix(in srgb, var(--case-color, #d2cfc5), #000 20%); border-radius: 8px 8px 14px 14px / 7px 7px 16px 16px; box-shadow: inset 0 2px 0 rgba(255,255,255,.32), inset 0 -9px 11px rgba(0,0,0,.08), 0 2px 0 color-mix(in srgb, var(--case-color, #d2cfc5), #000 24%), 0 12px 22px rgba(36,34,28,.11), 0 30px 44px rgba(36,34,28,.14); transform: perspective(1200px) rotateX(2.4deg); transform-origin: center center; transition: background .2s, padding .2s; }
+.keyboard::after { content: ""; position: absolute; z-index: 0; inset: calc(var(--case-padding-top) * .48) calc(var(--case-padding-inline) * .52) calc((var(--case-padding-bottom) + var(--case-front-depth)) * .56); border-radius: 4px 4px 9px 9px; background: linear-gradient(180deg, color-mix(in srgb, var(--case-color, #d2cfc5), #000 18%), color-mix(in srgb, var(--case-color, #d2cfc5), #000 10%)); box-shadow: inset 0 2px 3px rgba(0,0,0,.15), inset 0 -1px 0 rgba(255,255,255,.08), 0 1px 0 rgba(255,255,255,.08); pointer-events: none; }
+.keyboard-badge, .keyboard-grade-badge { position: absolute; z-index: 2; top: calc(var(--pitch) * .26); color: color-mix(in srgb, var(--case-color, #d2cfc5), #000 56%); font-size: 8px; font-weight: 800; letter-spacing: .12em; opacity: .58; pointer-events: none; }
+.keyboard-badge { left: calc(var(--pitch) * .42); }
+.keyboard-grade-badge { right: calc(var(--pitch) * .42); font-style: italic; letter-spacing: .03em; }
+.keyboard-classic, .keyboard-hybrid { border-radius: 8px 8px 14px 14px / 7px 7px 16px 16px; }
+.keyboard-hybrid { --case-padding-top: calc(var(--pitch) * .76); }
+.keyboard-hybrid::before { content: ""; position: absolute; z-index: 0; left: 7.5%; right: 7.5%; top: calc(var(--pitch) * -.34); height: calc(var(--pitch) * .52); border: 1px solid color-mix(in srgb, var(--case-color, #d2cfc5), #000 19%); border-bottom: 0; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, color-mix(in srgb, var(--case-color, #d2cfc5), #fff 11%), color-mix(in srgb, var(--case-color, #d2cfc5), #000 7%)); box-shadow: inset 0 2px 0 rgba(255,255,255,.22), inset 0 -6px 0 rgba(0,0,0,.1), 0 -1px 0 rgba(255,255,255,.12); }
+.keyboard-us.keyboard-product-hybrid-type-s-white,
+.keyboard-us.keyboard-product-hybrid-type-s-sumi,
+.keyboard-us.keyboard-product-hybrid-type-s-snow,
+.keyboard-us.keyboard-product-hybrid-white,
+.keyboard-us.keyboard-product-hybrid-sumi,
+.keyboard-jis.keyboard-product-hybrid-type-s-white,
+.keyboard-jis.keyboard-product-hybrid-type-s-sumi,
+.keyboard-jis.keyboard-product-hybrid-type-s-snow,
+.keyboard-jis.keyboard-product-hybrid-white,
+.keyboard-jis.keyboard-product-hybrid-sumi,
+.keyboard-us.keyboard-product-classic-type-s-white,
+.keyboard-us.keyboard-product-classic-type-s-sumi,
+.keyboard-us.keyboard-product-classic-type-s-snow,
+.keyboard-us.keyboard-product-classic-white,
+.keyboard-us.keyboard-product-classic-sumi,
+.keyboard-jis.keyboard-product-classic-type-s-white,
+.keyboard-jis.keyboard-product-classic-type-s-sumi,
+.keyboard-jis.keyboard-product-classic-type-s-snow,
+.keyboard-jis.keyboard-product-classic-white,
+.keyboard-jis.keyboard-product-classic-sumi { --case-padding-inline: calc(var(--pitch) * .22); --case-padding-top: calc(var(--pitch) * .64); --case-padding-bottom: calc(var(--pitch) * .18); --case-front-depth: calc(var(--pitch) * .16); border-radius: 2px 2px 5px 5px / 2px 2px 6px 6px; box-shadow: inset 0 1px 0 rgba(255,255,255,.3), inset 0 -5px 7px rgba(0,0,0,.07), 0 1px 0 color-mix(in srgb, var(--case-color, #d2cfc5), #000 22%), 0 10px 18px rgba(36,34,28,.1), 0 24px 38px rgba(36,34,28,.13); transform: perspective(1200px) rotateX(1.1deg); }
+.keyboard-us.keyboard-product-hybrid-type-s-white::after,
+.keyboard-us.keyboard-product-hybrid-type-s-sumi::after,
+.keyboard-us.keyboard-product-hybrid-type-s-snow::after,
+.keyboard-us.keyboard-product-hybrid-white::after,
+.keyboard-us.keyboard-product-hybrid-sumi::after,
+.keyboard-jis.keyboard-product-hybrid-type-s-white::after,
+.keyboard-jis.keyboard-product-hybrid-type-s-sumi::after,
+.keyboard-jis.keyboard-product-hybrid-type-s-snow::after,
+.keyboard-jis.keyboard-product-hybrid-white::after,
+.keyboard-jis.keyboard-product-hybrid-sumi::after,
+.keyboard-us.keyboard-product-classic-type-s-white::after,
+.keyboard-us.keyboard-product-classic-type-s-sumi::after,
+.keyboard-us.keyboard-product-classic-type-s-snow::after,
+.keyboard-us.keyboard-product-classic-white::after,
+.keyboard-us.keyboard-product-classic-sumi::after,
+.keyboard-jis.keyboard-product-classic-type-s-white::after,
+.keyboard-jis.keyboard-product-classic-type-s-sumi::after,
+.keyboard-jis.keyboard-product-classic-type-s-snow::after,
+.keyboard-jis.keyboard-product-classic-white::after,
+.keyboard-jis.keyboard-product-classic-sumi::after { inset: calc(var(--case-padding-top) * .48) calc(var(--case-padding-inline) * .32) calc((var(--case-padding-bottom) + var(--case-front-depth)) * .5); border-radius: 2px 2px 4px 4px; background: color-mix(in srgb, var(--case-color, #d2cfc5), #000 11%); box-shadow: inset 0 1px 2px rgba(0,0,0,.11), inset 0 -1px 0 rgba(255,255,255,.08); }
+.keyboard-us.keyboard-product-hybrid-type-s-white::before,
+.keyboard-us.keyboard-product-hybrid-type-s-sumi::before,
+.keyboard-us.keyboard-product-hybrid-type-s-snow::before,
+.keyboard-us.keyboard-product-hybrid-white::before,
+.keyboard-us.keyboard-product-hybrid-sumi::before,
+.keyboard-jis.keyboard-product-hybrid-type-s-white::before,
+.keyboard-jis.keyboard-product-hybrid-type-s-sumi::before,
+.keyboard-jis.keyboard-product-hybrid-type-s-snow::before,
+.keyboard-jis.keyboard-product-hybrid-white::before,
+.keyboard-jis.keyboard-product-hybrid-sumi::before { left: 10.5%; right: 10.5%; top: calc(var(--pitch) * -.22); height: calc(var(--pitch) * .3); border-radius: 3px 3px 1px 1px; }
+.keyboard-us.keyboard-product-hybrid-type-s-white .keyboard-badge,
+.keyboard-us.keyboard-product-hybrid-type-s-sumi .keyboard-badge,
+.keyboard-us.keyboard-product-hybrid-type-s-snow .keyboard-badge,
+.keyboard-us.keyboard-product-hybrid-white .keyboard-badge,
+.keyboard-us.keyboard-product-hybrid-sumi .keyboard-badge,
+.keyboard-jis.keyboard-product-hybrid-type-s-white .keyboard-badge,
+.keyboard-jis.keyboard-product-hybrid-type-s-sumi .keyboard-badge,
+.keyboard-jis.keyboard-product-hybrid-type-s-snow .keyboard-badge,
+.keyboard-jis.keyboard-product-hybrid-white .keyboard-badge,
+.keyboard-jis.keyboard-product-hybrid-sumi .keyboard-badge,
+.keyboard-us.keyboard-product-classic-type-s-white .keyboard-badge,
+.keyboard-us.keyboard-product-classic-type-s-sumi .keyboard-badge,
+.keyboard-us.keyboard-product-classic-type-s-snow .keyboard-badge,
+.keyboard-us.keyboard-product-classic-white .keyboard-badge,
+.keyboard-us.keyboard-product-classic-sumi .keyboard-badge,
+.keyboard-jis.keyboard-product-classic-type-s-white .keyboard-badge,
+.keyboard-jis.keyboard-product-classic-type-s-sumi .keyboard-badge,
+.keyboard-jis.keyboard-product-classic-type-s-snow .keyboard-badge,
+.keyboard-jis.keyboard-product-classic-white .keyboard-badge,
+.keyboard-jis.keyboard-product-classic-sumi .keyboard-badge { top: calc(var(--pitch) * .14); left: calc(var(--pitch) * .2); font-size: 7px; letter-spacing: .02em; opacity: .64; }
+.keyboard-us.keyboard-product-hybrid-type-s-white .keyboard-grade-badge,
+.keyboard-us.keyboard-product-hybrid-type-s-sumi .keyboard-grade-badge,
+.keyboard-us.keyboard-product-hybrid-type-s-snow .keyboard-grade-badge,
+.keyboard-jis.keyboard-product-hybrid-type-s-white .keyboard-grade-badge,
+.keyboard-jis.keyboard-product-hybrid-type-s-sumi .keyboard-grade-badge,
+.keyboard-jis.keyboard-product-hybrid-type-s-snow .keyboard-grade-badge,
+.keyboard-us.keyboard-product-classic-type-s-white .keyboard-grade-badge,
+.keyboard-us.keyboard-product-classic-type-s-sumi .keyboard-grade-badge,
+.keyboard-us.keyboard-product-classic-type-s-snow .keyboard-grade-badge,
+.keyboard-jis.keyboard-product-classic-type-s-white .keyboard-grade-badge,
+.keyboard-jis.keyboard-product-classic-type-s-sumi .keyboard-grade-badge,
+.keyboard-jis.keyboard-product-classic-type-s-snow .keyboard-grade-badge { top: calc(var(--pitch) * .14); right: calc(var(--pitch) * .2); font-size: 7px; opacity: .64; }
+.keyboard-classic { --case-padding-top: calc(var(--pitch) * .72); }
+.keyboard-classic::before { content: ""; position: absolute; z-index: 0; left: 6.5%; right: 6.5%; top: calc(var(--pitch) * .2); height: 1px; background: color-mix(in srgb, var(--case-color, #d2cfc5), #000 22%); opacity: .3; pointer-events: none; }
+.keyboard-classic .keyboard-badge { top: calc(var(--pitch) * .24); left: calc(var(--pitch) * .42); }
 .keyboard-studio { --pitch: clamp(32px, 3.95vw, 50px); --key-gap-ratio: .08; --key-bottom-width: .92; --key-top-width: .82; --key-front-depth: calc(var(--pitch) * .10); --case-padding-inline: calc(var(--pitch) * .42); --case-padding-top: calc(var(--pitch) * .64); --case-padding-bottom: calc(var(--pitch) * .78); --case-front-depth: calc(var(--pitch) * .22); --case-depth: calc(var(--pitch) * 5 - var(--key-gap) + var(--case-padding-top) + var(--case-padding-bottom) + var(--case-front-depth)); --studio-pointer-x: calc(var(--case-padding-inline) + var(--pitch) * 6.73 - var(--key-gap) * .5); --studio-pointer-y: calc(var(--case-padding-top) + (var(--key-height) + var(--key-row-gap)) * 2 + var(--key-height) * .83); --key-side-radius: 3px 3px 2px 2px; --key-top-radius: 3px 3px 3px 3px / 3px 3px 4px 4px; border-radius: 11px 11px 16px 16px; }
 .keyboard-studio::after { inset: 12px 16px 17px; background: color-mix(in srgb, var(--case-color, #d2cfc5), #000 38%); box-shadow: inset 0 4px 7px rgba(0,0,0,.28), inset 0 -1px 0 rgba(255,255,255,.035); }
 .keyboard-studio::before { content: ""; position: absolute; z-index: 1; left: 18px; right: 18px; top: 13px; height: 5px; border-radius: 999px; background: rgba(0,0,0,.18); pointer-events: none; }
 .key-row { position: relative; z-index: 1; display: flex; justify-content: center; gap: var(--key-gap); margin-bottom: var(--key-row-gap); }.key-row:last-child { margin-bottom: 0; }
 .keyboard-jis .key-row { justify-content: flex-start; }
 .key { --key-shape-inset: var(--key-top-inset); --key-shape-front-depth: var(--key-front-depth); position: relative; z-index: 1; width: calc(var(--pitch) * var(--w, 1) - var(--key-gap)); height: var(--key-height); flex: 0 0 auto; padding: 0; border: 0; background: transparent; color: var(--legend-color); font-size: clamp(6px, .68vw, 9px); font-weight: 450; line-height: 1.08; cursor: pointer; transition: transform .1s; }
-.key-side { position: absolute; z-index: 1; inset: 2px var(--key-side-inset) 1px; border: 1px solid color-mix(in srgb, var(--key-color), #000 14%); border-radius: var(--key-side-radius); background: linear-gradient(180deg, var(--key-color), color-mix(in srgb, var(--key-color), #000 10%)); box-shadow: 0 2px 2px rgb(0 0 0 / 16%); pointer-events: none; }
-.key-top { position: absolute; z-index: 2; inset: 1px var(--key-shape-inset) calc(var(--key-shape-front-depth) + 1px); display: flex; align-items: flex-start; justify-content: flex-start; padding: 6px 5px; border: 1px solid color-mix(in srgb, var(--key-color), #000 10%); border-bottom-color: color-mix(in srgb, var(--key-color), #000 14%); border-radius: var(--key-top-radius); background: radial-gradient(ellipse 72% 44% at 50% 52%, color-mix(in srgb, var(--key-color), #000 3%) 0%, transparent 72%), linear-gradient(145deg, rgba(255,255,255,.05), transparent 38%), linear-gradient(180deg, color-mix(in srgb, var(--key-color), #fff 5%), var(--key-color) 62%, color-mix(in srgb, var(--key-color), #000 4%)); box-shadow: inset 0 1px 1px rgba(255,255,255,.12), inset 0 -1px 2px rgba(0,0,0,.07), 0 1px 1px rgba(0,0,0,.07); pointer-events: none; }
+.key-side { position: absolute; z-index: 1; inset: 1px var(--key-side-inset) 0; border: 1px solid color-mix(in srgb, var(--key-color), #000 16%); border-radius: var(--key-side-radius); background: linear-gradient(180deg, color-mix(in srgb, var(--key-color), #fff 3%) 0%, var(--key-color) 42%, color-mix(in srgb, var(--key-color), #000 14%) 100%); box-shadow: 0 2px 2px rgb(0 0 0 / 18%); pointer-events: none; }
+.key-side::after { content: ""; position: absolute; left: calc(var(--key-shape-inset) * .5); right: calc(var(--key-shape-inset) * .5); bottom: 0; height: calc(var(--key-shape-front-depth) + 2px); border-radius: 0 0 5px 5px; background: linear-gradient(180deg, color-mix(in srgb, var(--key-color), #000 8%), color-mix(in srgb, var(--key-color), #000 18%)); opacity: .75; }
+.key-top { position: absolute; z-index: 2; inset: 0 var(--key-shape-inset) calc(var(--key-shape-front-depth) + 1px); display: flex; align-items: flex-start; justify-content: flex-start; padding: 6px 5px; border: 1px solid color-mix(in srgb, var(--key-color), #000 12%); border-bottom-color: color-mix(in srgb, var(--key-color), #000 16%); border-radius: var(--key-top-radius); background: radial-gradient(ellipse 74% 46% at 50% 54%, color-mix(in srgb, var(--key-color), #000 4%) 0%, transparent 70%), linear-gradient(145deg, rgba(255,255,255,.07), transparent 40%), linear-gradient(180deg, color-mix(in srgb, var(--key-color), #fff 7%), var(--key-color) 64%, color-mix(in srgb, var(--key-color), #000 5%)); box-shadow: inset 0 1px 1px rgba(255,255,255,.14), inset 0 -1px 2px rgba(0,0,0,.08), 0 1px 1px rgba(0,0,0,.08); pointer-events: none; }
 .key-wide { --key-shape-inset: max(1px, calc(var(--key-top-inset) * .8)); }
 .key.space { --key-shape-inset: max(1px, calc(var(--key-top-inset) * .65)); }
 .key-row-1 { transform: translateY(0); }
@@ -104,7 +190,8 @@ main { width: min(1320px, calc(100% - 40px)); margin: auto; }
 .legend-icon-svg polygon { fill: none; }
 .key.spacer { padding: 0; border: 0; background: transparent; box-shadow: none; visibility: hidden; pointer-events: none; }
 .key.spacer .key-side, .key.spacer .key-top { display: none; }
-.key.jis-enter { --key-shape-inset: max(1px, calc(var(--key-top-inset) * .75)); z-index: 3; height: calc(var(--key-height) * 2 + var(--key-row-gap)); margin-bottom: calc(-1 * (var(--key-height) + var(--key-row-gap))); clip-path: polygon(0 0, 100% 0, 100% 100%, calc(17% + var(--key-shape-inset) / 2) 100%, calc(17% + var(--key-shape-inset) / 2) 50%, 0 50%); }
+.key.jis-enter { --key-shape-inset: max(1px, calc(var(--key-top-inset) * .75)); --jis-enter-notch-x: calc(17% + var(--key-shape-inset) / 2); --jis-enter-notch-y: 52%; z-index: 3; height: calc(var(--key-height) * 2 + var(--key-row-gap)); margin-bottom: calc(-1 * (var(--key-height) + var(--key-row-gap))); clip-path: polygon(0 0, 100% 0, 100% 100%, var(--jis-enter-notch-x) 100%, var(--jis-enter-notch-x) var(--jis-enter-notch-y), 0 var(--jis-enter-notch-y)); }
+.key.jis-enter .key-side::before { content: ""; position: absolute; left: var(--jis-enter-notch-x); top: var(--jis-enter-notch-y); width: calc(100% - var(--jis-enter-notch-x)); height: calc(100% - var(--jis-enter-notch-y)); border-top: 1px solid color-mix(in srgb, var(--key-color), #fff 6%); border-left: 1px solid color-mix(in srgb, var(--key-color), #000 18%); box-shadow: -1px 0 0 rgba(255,255,255,.06); pointer-events: none; }
 .key.jis-enter .key-top { justify-content: flex-end; }
 .key.arrow { font-size: clamp(11px, 1vw, 14px); }.key.arrow .key-top { align-items: center; justify-content: center; }.key.arrow .legend-icon { width: 1.25em; height: 1.25em; }
 .key:hover { transform: translateY(-1px); }.key:hover .key-side { box-shadow: 0 3px 3px rgb(0 0 0 / 18%); }.key:active { transform: translateY(1px); --key-shape-front-depth: 2px; }.key:active .key-side { box-shadow: 0 1px 1px rgb(0 0 0 / 14%); }
@@ -155,7 +242,7 @@ footer { padding: 28px 48px; display: flex; justify-content: space-between; bord
   .site-header { height: 70px; }.button { padding: 0 12px; }.brand-mark { width: 34px; height: 34px; }
   .icon-button { width: 40px; padding: 0; }
   main { width: min(100% - 24px, 1180px); }.hero { padding: 34px 4px 24px; }.hero h1 { font-size: 40px; }.lead { font-size: 12px; }
-  .workspace { border-radius: 14px; }.canvas-card { padding: 18px 12px 20px; }.canvas-toolbar { padding: 0 4px; }.canvas-toolbar p { max-width: 128px; }.keyboard-stage { min-height: 290px; margin: 18px -4px 0; padding: 34px 8px 28px; }.keyboard { --pitch: clamp(17px, calc((100vw - 52px) / 15.84), 38px); --pitch: clamp(17px, calc(100cqw / 15.84), 38px); flex: 0 0 auto; }.keyboard-hybrid::before { top: calc(var(--pitch) * -.27); height: calc(var(--pitch) * .44); }.keyboard-studio { --pitch: clamp(17px, calc((100vw - 54px) / 15.84), 34px); --pitch: clamp(17px, calc(100cqw / 15.84), 34px); }.keyboard-badge { top: 6px; right: 8px; font-size: 7px; }.key { font-size: clamp(4px, 1.17vw, 7px); }.key-top { padding: clamp(2px, 1vw, 6px) clamp(1px, .8vw, 5px); }.hint { font-size: 9px; }
+  .workspace { border-radius: 14px; }.canvas-card { padding: 18px 12px 20px; }.canvas-toolbar { padding: 0 4px; }.canvas-toolbar p { max-width: 128px; }.keyboard-stage { min-height: 290px; margin: 18px -4px 0; padding: 34px 8px 28px; }.keyboard { --pitch: clamp(17px, calc((100vw - 52px) / 15.84), 38px); --pitch: clamp(17px, calc(100cqw / 15.84), 38px); --key-top-width: .82; --key-front-depth: calc(var(--pitch) * .09); flex: 0 0 auto; }.keyboard-hybrid::before { top: calc(var(--pitch) * -.27); height: calc(var(--pitch) * .44); }.keyboard-studio { --pitch: clamp(17px, calc((100vw - 54px) / 15.84), 34px); --pitch: clamp(17px, calc(100cqw / 15.84), 34px); }.keyboard-badge { top: 6px; left: 8px; font-size: 7px; }.keyboard-grade-badge { top: 6px; right: 8px; font-size: 7px; }.key { font-size: clamp(4px, 1.17vw, 7px); }.key-top { padding: clamp(2px, 1vw, 6px) clamp(1px, .8vw, 5px); }.hint { font-size: 9px; }
   .toolbar-options { align-items: flex-end; flex-direction: column; gap: 7px; }.layout-button { min-height: 44px; padding: 8px 10px; }.canvas-toolbar p { justify-content: flex-end; }
   .controls-card { display: block; padding: 26px 20px; }.model-series { grid-template-columns: 1fr; margin-bottom: 24px; }.layout-options, .body-colors { margin-bottom: 24px; }.model-title, .layout-title, .body-color-title, .color-title { margin-bottom: 12px; }.palette { grid-template-columns: repeat(4, 1fr); }.presets-heading { margin-top: 28px; }.presets[hidden] { display: none; }.color-dot { width: 46px; height: 46px; }
   .tips { padding: 72px 4px; }.tip-grid { grid-template-columns: 1fr; }.tip-grid article, .tip-grid article + article { padding: 22px; border: 1px solid var(--line); border-radius: 14px; }.tips h2 { margin-bottom: 24px; font-size: 30px; }

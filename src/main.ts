@@ -124,7 +124,7 @@ function resolveColor(color: ColorDefinition, key?: KeyContext): string {
 function renderKeyboard(): void {
   const product = currentProductAppearance();
   keyboard.innerHTML = "";
-  keyboard.className = `keyboard keyboard-${currentLayout} keyboard-${product.caseStyle} legend-${product.legendVariant}`;
+  keyboard.className = `keyboard keyboard-${currentLayout} keyboard-${product.caseStyle} keyboard-product-${product.id} legend-${product.legendVariant}`;
   keyboard.style.setProperty("--case-color", product.colorValue);
   keyboard.style.setProperty("--case-shadow", textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816");
   let index = 0;
@@ -210,9 +210,17 @@ function renderKeyboard(): void {
 
   const badge = document.createElement("span");
   badge.className = "keyboard-badge";
-  badge.textContent = "HHKB";
+  badge.textContent = product.series.startsWith("HYBRID") ? "HHKB Professional HYBRID" : "HHKB";
   badge.setAttribute("aria-hidden", "true");
   keyboard.append(badge);
+
+  if (product.series.includes("Type-S")) {
+    const gradeBadge = document.createElement("span");
+    gradeBadge.className = "keyboard-grade-badge";
+    gradeBadge.textContent = "Type-S";
+    gradeBadge.setAttribute("aria-hidden", "true");
+    keyboard.append(gradeBadge);
+  }
 
   keyboard.setAttribute("aria-label", `HHKB ${product.series} ${product.colorName} ${layouts[currentLayout].name}`);
 }
