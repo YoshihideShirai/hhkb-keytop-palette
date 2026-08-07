@@ -40,9 +40,11 @@ const toastElement = queryElement<HTMLDivElement>("#toast");
 let selected = colors[0];
 let keyColors: string[] = [];
 let currentLayout: LayoutName = "us";
-let currentProduct: ProductId = "hybrid-type-s-sumi";
+let currentProduct: ProductId = "hybrid-type-s-white";
 let savedDesigns: Partial<Record<LayoutName, string[]>> = {};
 let toastTimer: number | undefined;
+const defaultProduct: ProductId = "hybrid-type-s-white";
+const bodyColorOrder = ["白", "墨", "雪"];
 
 function setPresetsExpanded(expanded: boolean): void {
   presetsToggle.setAttribute("aria-expanded", String(expanded));
@@ -67,7 +69,14 @@ function currentProductAppearance(): ProductAppearance {
 
 function productsForCurrentSeries(): ProductAppearance[] {
   const currentSeries = currentProductAppearance().series;
-  return productAppearances.filter((product) => product.series === currentSeries);
+  return productAppearances
+    .filter((product) => product.series === currentSeries)
+    .sort((a, b) => bodyColorOrder.indexOf(a.colorName) - bodyColorOrder.indexOf(b.colorName));
+}
+
+function defaultProductForSeries(series: ProductSeries): ProductAppearance | undefined {
+  return productAppearances.find((product) => product.series === series && product.colorName === "白")
+    ?? productAppearances.find((product) => product.series === series);
 }
 
 function currentRows(): KeyDefinition[][] {
@@ -272,7 +281,7 @@ productSeries.forEach((series) => {
   button.className = "product model-button";
   button.dataset.series = series;
   button.setAttribute("aria-pressed", "false");
-  const representative = productAppearances.find((product) => product.series === series);
+  const representative = defaultProductForSeries(series);
   button.innerHTML = `<span class="product-swatch" style="--color:${representative?.colorValue ?? "#d8d2c5"}"></span><span><strong>${series}</strong><small>${representative?.detail ?? ""}</small></span>`;
   button.addEventListener("click", () => selectSeries(series));
   modelSeries.append(button);
@@ -387,7 +396,7 @@ function load(): void {
       savedDesigns.us = stored;
     } else if (stored && typeof stored === "object") {
       currentLayout = isLayoutName(stored.layout) ? stored.layout : "us";
-      currentProduct = isProductId(stored.product) ? stored.product : "hybrid-type-s-sumi";
+      currentProduct = isProductId(stored.product) ? stored.product : defaultProduct;
       savedDesigns = stored.designs || { [currentLayout]: stored.colors };
     }
 
@@ -420,9 +429,7 @@ function selectProduct(product: string | undefined, applyFactoryColors = false, 
 }
 
 function selectSeries(series: ProductSeries): void {
-  const current = currentProductAppearance();
-  const next = productAppearances.find((product) => product.series === series && product.colorName === current.colorName)
-    ?? productAppearances.find((product) => product.series === series);
+  const next = defaultProductForSeries(series);
 
   if (next) {
     selectProduct(next.id, true, true);
