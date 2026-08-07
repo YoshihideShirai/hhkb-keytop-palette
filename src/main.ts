@@ -46,16 +46,13 @@ const toastElement = queryElement<HTMLDivElement>("#toast");
 
 let selected = colors[0];
 
-const mobileHeader = window.matchMedia("(max-width: 600px)");
-
 function setHeaderMenuOpen(open: boolean, restoreFocus = false) {
-  const shouldOpen = mobileHeader.matches && open;
-  menuButton.setAttribute("aria-expanded", String(shouldOpen));
-  headerMenu.hidden = mobileHeader.matches ? !shouldOpen : false;
+  menuButton.setAttribute("aria-expanded", String(open));
+  headerMenu.hidden = !open;
 
-  if (shouldOpen) {
+  if (open) {
     headerMenu.querySelector<HTMLElement>("button, a[href]")?.focus();
-  } else if (restoreFocus && mobileHeader.matches) {
+  } else if (restoreFocus) {
     menuButton.focus();
   }
 }
@@ -80,7 +77,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-mobileHeader.addEventListener("change", () => setHeaderMenuOpen(false));
 setHeaderMenuOpen(false);
 let keyColors: string[] = [];
 let currentLayout: LayoutName = "us";
