@@ -48,6 +48,4 @@ npm run dev
 
 ## Google Analytics
 
-Google Analytics 4でアクセスを記録する場合は、GA4の測定ID（例: `G-XXXXXXXXXX`）をGitHubリポジトリの **Settings → Secrets and variables → Actions → Variables** に `VITE_GA_MEASUREMENT_ID` として登録してください。Secretとして同名で登録しても動作します。
-
-`main` ブランチへpushすると、GitHub Pagesのビルド時に測定IDが渡され、公開サイトでGoogle Analyticsの計測タグが読み込まれます。未設定の場合、計測タグは読み込まれません。
+Google Analytics 4の計測タグは `index.html` の `<head>` に設定しています。
