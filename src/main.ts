@@ -1,5 +1,6 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
+import { initGoogleAnalytics } from "./analytics";
 import { colors, keytop, layouts } from "./catalog";
 import { isWhiteProduct, isWhiteProductSpecialKey, textColor } from "./key-utils";
 import type { FixedPresetDefinition } from "./preset-format";
@@ -21,6 +22,8 @@ import {
   type SavedState,
 } from "./types";
 import { queryElement } from "./utils/dom";
+
+initGoogleAnalytics();
 
 const keyboard = queryElement<HTMLDivElement>("#keyboard");
 const palette = queryElement<HTMLDivElement>("#palette");
