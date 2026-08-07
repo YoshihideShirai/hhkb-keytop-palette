@@ -34,6 +34,7 @@ const customColor = queryElement<HTMLInputElement>("#customColor");
 const customColorValue = queryElement<HTMLOutputElement>("#customColorValue");
 const resetButton = queryElement<HTMLButtonElement>("#resetButton");
 const saveButton = queryElement<HTMLButtonElement>("#saveButton");
+const loadButton = queryElement<HTMLButtonElement>("#loadButton");
 const downloadPresetButton = queryElement<HTMLButtonElement>("#downloadPresetButton");
 const uploadPresetButton = queryElement<HTMLButtonElement>("#uploadPresetButton");
 const uploadPresetInput = queryElement<HTMLInputElement>("#uploadPresetInput");
@@ -306,6 +307,41 @@ function save(): boolean {
   }
 }
 
+function renderLayoutControls(): void {
+  document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
+    const active = button.dataset.layout === currentLayout;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function applyStoredDesign(stored: SavedState | string[] | null): boolean {
+  let nextLayout: LayoutName = "us";
+  let nextProduct: ProductId = defaultProduct;
+  let nextSavedDesigns: Partial<Record<LayoutName, string[]>> = {};
+
+  if (Array.isArray(stored)) {
+    nextSavedDesigns.us = stored;
+  } else if (stored && typeof stored === "object") {
+    nextLayout = isLayoutName(stored.layout) ? stored.layout : "us";
+    nextProduct = isProductId(stored.product) ? stored.product : defaultProduct;
+    nextSavedDesigns = stored.designs || (Array.isArray(stored.colors) ? { [nextLayout]: stored.colors } : {});
+  } else {
+    return false;
+  }
+
+  const values = nextSavedDesigns[nextLayout];
+  if (!Array.isArray(values) || values.length !== layouts[nextLayout].rows.flat().length || values.some((value) => typeof value !== "string")) {
+    return false;
+  }
+
+  currentLayout = nextLayout;
+  currentProduct = nextProduct;
+  savedDesigns = nextSavedDesigns;
+  keyColors = values;
+  return true;
+}
+
 function rowsFromCurrentDesign(): string[][] {
   let index = 0;
   return currentRows().map((row) => row.map(() => keyColors[index++]));
@@ -399,11 +435,7 @@ function applyUploadedPreset(preset: FixedPresetDefinition): void {
   keyColors = preset.rows.flatMap((row) => row.colors).map((color, index) => resolveColor(color, contexts[index]));
   savedDesigns[currentLayout] = keyColors;
 
-  document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
-    const active = button.dataset.layout === currentLayout;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
+  renderLayoutControls();
 
   renderPresets();
   renderKeyboard();
@@ -520,18 +552,28 @@ function load(): void {
       ? deserializeDesignParam(query)
       : JSON.parse(localStorage.getItem("hhkb-keytop-palette") || "null") as SavedState | string[] | null;
 
-    if (Array.isArray(stored)) {
-      savedDesigns.us = stored;
-    } else if (stored && typeof stored === "object") {
-      currentLayout = isLayoutName(stored.layout) ? stored.layout : "us";
-      currentProduct = isProductId(stored.product) ? stored.product : defaultProduct;
-      savedDesigns = stored.designs || { [currentLayout]: stored.colors };
+    if (!applyStoredDesign(stored)) {
+      keyColors = defaultColors();
     }
-
-    const values = savedDesigns[currentLayout];
-    keyColors = Array.isArray(values) && values.length === currentRows().flat().length ? values : defaultColors();
   } catch {
     keyColors = defaultColors();
+  }
+}
+
+function loadBrowserSavedDesign(): void {
+  try {
+    const stored = JSON.parse(localStorage.getItem("hhkb-keytop-palette") || "null") as SavedState | string[] | null;
+    if (!applyStoredDesign(stored)) {
+      toast("ブラウザ保存したデザインがありません");
+      return;
+    }
+
+    renderLayoutControls();
+    selectProduct(currentProduct);
+    syncUserChangeToUrl();
+    toast("ブラウザ保存を読み込みました");
+  } catch {
+    toast("ブラウザ保存を読み込めません");
   }
 }
 
@@ -605,11 +647,7 @@ function selectLayout(layout: string | undefined): void {
   const saved = savedDesigns[currentLayout];
   keyColors = Array.isArray(saved) && saved.length === currentRows().flat().length ? saved : defaultColors();
 
-  document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
-    const active = button.dataset.layout === currentLayout;
-    button.classList.toggle("active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
+  renderLayoutControls();
 
   renderPresets();
   renderKeyboard();
@@ -636,8 +674,10 @@ resetButton.addEventListener("click", () => {
 
 saveButton.addEventListener("click", () => {
   const persisted = save();
-  toast(persisted ? "デザインを保存しました" : "保存は利用できません");
+  toast(persisted ? "ブラウザに保存しました" : "ブラウザ保存は利用できません");
 });
+
+loadButton.addEventListener("click", loadBrowserSavedDesign);
 
 downloadPresetButton.addEventListener("click", downloadPresetFile);
 
@@ -671,10 +711,6 @@ shareButton.addEventListener("click", async () => {
 
 load();
 selectProduct(currentProduct);
-document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
-  const active = button.dataset.layout === currentLayout;
-  button.classList.toggle("active", active);
-  button.setAttribute("aria-pressed", String(active));
-});
+renderLayoutControls();
 chooseColor(selected);
 renderKeyboard();
