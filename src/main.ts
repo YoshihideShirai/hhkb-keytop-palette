@@ -89,7 +89,7 @@ function currentKeyContexts(): KeyContext[] {
 }
 
 function accessibleLegend(legend: KeyLegend): string {
-  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.symbol, legend.icon].filter(Boolean).join(" ");
+  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.front, legend.symbol, legend.icon].filter(Boolean).join(" ");
 }
 
 function createLegendIcon(icon: KeyIcon): SVGSVGElement {
@@ -164,6 +164,12 @@ function renderKeyboard(): void {
         secondary.className = "legend-secondary";
         secondary.textContent = legend.secondary;
         keyLabel.append(secondary);
+      }
+      if (legend.front) {
+        const front = document.createElement("span");
+        front.className = "legend-front";
+        front.textContent = legend.front;
+        keyLabel.append(front);
       }
       if (legend.symbol) {
         const symbol = document.createElement("span");

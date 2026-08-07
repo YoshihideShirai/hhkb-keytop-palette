@@ -19,21 +19,23 @@
       <path d="M4 12h16" />
       <path d="M13 5l7 7-7 7" />
     </symbol>
-    <symbol id="legend-input-mode" viewBox="0 0 24 24">
-      <path d="M6 5h12" />
-      <path d="M6 19h12" />
-      <path d="M12 5v14" />
-      <path d="M8 9l-3 3 3 3" />
-      <path d="M16 9l3 3-3 3" />
+    <symbol id="legend-hhkb-mark" viewBox="0 0 24 24">
+      <path d="M4.5 6.5v11" />
+      <path d="M8.3 6.5v11" />
+      <path d="M4.5 12h7.2" />
+      <path d="M13.2 6.5v11" />
+      <path d="M17 6.5v11" />
+      <path d="M13.2 12h6.3" />
+      <path d="M20 7.2l-2.5 4.8 2.5 4.8" />
     </symbol>
     <symbol id="legend-non-convert" viewBox="0 0 24 24">
-      <path d="M4 15c2.4 0 2.4-6 4.8-6s2.4 6 4.8 6 2.4-6 4.8-6" />
-      <path d="M4 19h16" />
+      <path d="M5 15.6c2.5 0 2.5-7.2 5-7.2s2.5 7.2 5 7.2 2.5-7.2 5-7.2" />
+      <path d="M5 18.6h15" />
     </symbol>
     <symbol id="legend-convert" viewBox="0 0 24 24">
-      <path d="M18.5 8.5A7 7 0 1 0 19 16" />
-      <path d="M19 4v5h-5" />
-      <path d="M15 16h5v5" />
+      <path d="M17.6 7.2h-8a4.8 4.8 0 0 0-4.8 4.8v0a4.8 4.8 0 0 0 4.8 4.8h5.9" />
+      <path d="M15 12.8l3.8 4-3.8 4" />
+      <path d="M8.9 11.2l-3.7-4 3.7-4" />
     </symbol>
   </defs>
 </svg>
