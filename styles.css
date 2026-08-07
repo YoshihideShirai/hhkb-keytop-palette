@@ -26,6 +26,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid color-mix(in srgb
 .brand strong, .brand small { display: block; letter-spacing: .08em; }
 .brand strong { font-size: 14px; }.brand small { margin-top: 2px; font-size: 8px; color: var(--muted); }
 .header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; }
+.header-menu-panel, .header-menu-panel[hidden], .menu-group { display: contents; }
+.menu-group-label, .menu-button { display: none; }
+#shareButton { order: 2; }.menu-button { order: 3; }
 .button { min-height: 40px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line-strong); border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12px; letter-spacing: .03em; text-decoration: none; transition: transform .15s, background .15s, border-color .15s, box-shadow .15s; }
 .button i { font-size: 14px; line-height: 1; }
 .icon-button { width: auto; min-width: 40px; padding: 0 12px; white-space: nowrap; }
@@ -239,8 +242,10 @@ footer { padding: 28px 48px; display: flex; justify-content: space-between; bord
   .canvas-card { position: static; border-radius: 0 0 14px 14px; }
 }
 @media (max-width: 600px) {
-  .site-header { height: auto; min-height: 70px; padding: 10px 16px; gap: 10px; }.button { min-height: 36px; padding: 0 10px; font-size: 11px; }.brand-mark { width: 34px; height: 34px; }
-  .brand { flex: 1 1 150px; }.header-actions { flex: 1 1 260px; gap: 6px; }.icon-button { min-width: 36px; padding: 0 10px; }
+  .site-header { height: 64px; padding: 0 12px; gap: 8px; flex-wrap: nowrap; }.button { min-height: 36px; padding: 0 10px; font-size: 11px; }.brand-mark { width: 34px; height: 34px; }
+  .brand { min-width: 0; flex: 1 1 auto; gap: 8px; }.header-actions { flex: 0 0 auto; flex-wrap: nowrap; gap: 6px; }.icon-button { min-width: 36px; padding: 0 9px; }.menu-button { display: inline-flex; }
+  .header-menu-panel { position: absolute; z-index: 1; top: 100%; right: 12px; width: min(320px, calc(100vw - 24px)); max-height: calc(100dvh - 76px); overflow-y: auto; overscroll-behavior: contain; padding: 8px; display: block; border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: 0 18px 40px rgba(17, 24, 39, .18); }
+  .header-menu-panel[hidden] { display: none; }.menu-group { display: grid; grid-template-columns: 1fr; gap: 4px; padding: 8px; }.menu-group + .menu-group { border-top: 1px solid var(--line); }.menu-group-label { display: block; margin: 0 0 4px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .08em; }.header-menu-panel .button { width: 100%; justify-content: flex-start; border-color: transparent; }.header-menu-panel .button:hover { background: var(--paper); box-shadow: none; transform: none; }
   main { width: min(100% - 24px, 1180px); }.hero { padding: 34px 4px 24px; }.hero h1 { font-size: 40px; }.lead { font-size: 12px; }
   .workspace { border-radius: 14px; }.canvas-card { padding: 18px 12px 20px; }.canvas-toolbar { padding: 0 4px; }.canvas-toolbar p { max-width: 128px; }.keyboard-stage { min-height: 290px; margin: 18px -4px 0; padding: 34px 8px 28px; }.keyboard { --pitch: clamp(17px, calc((100vw - 52px) / 15.84), 38px); --pitch: clamp(17px, calc(100cqw / 15.84), 38px); --key-top-width: .82; --key-front-depth: calc(var(--pitch) * .09); flex: 0 0 auto; }.keyboard-hybrid::before { top: calc(var(--pitch) * -.27); height: calc(var(--pitch) * .44); }.keyboard-studio { --pitch: clamp(17px, calc((100vw - 54px) / 15.84), 34px); --pitch: clamp(17px, calc(100cqw / 15.84), 34px); }.keyboard-badge { top: 6px; left: 8px; font-size: 7px; }.keyboard-grade-badge { top: 6px; right: 8px; font-size: 7px; }.key { font-size: clamp(4px, 1.17vw, 7px); }.key-top { padding: clamp(2px, 1vw, 6px) clamp(1px, .8vw, 5px); }.hint { font-size: 9px; }
   .toolbar-options { align-items: flex-end; flex-direction: column; gap: 7px; }.layout-button { min-height: 44px; padding: 8px 10px; }.canvas-toolbar p { justify-content: flex-end; }
