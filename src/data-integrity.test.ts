@@ -36,6 +36,14 @@ describe("keyboard catalog", () => {
       expect([legend.primary, legend.secondary, legend.front, legend.symbol, legend.icon].filter(Boolean).every((part) => !part?.includes("\n"))).toBe(true);
     });
   });
+
+  it("matches the official US modifier placement", () => {
+    const shiftRowLabels = layouts.us.rows[3].map(([legend]) => legend.accessibleLabel ?? legend.primary);
+    const bottomRowLabels = layouts.us.rows[4].map(([legend]) => legend.accessibleLabel ?? legend.primary);
+
+    expect(shiftRowLabels).toEqual(["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift", "Fn"]);
+    expect(bottomRowLabels).toEqual(["Alt", "◇", "スペース", "◇", "Alt"]);
+  });
 });
 
 describe("product catalog", () => {

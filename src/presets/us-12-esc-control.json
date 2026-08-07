@@ -118,9 +118,11 @@
         ", < End",
         ". > ↓",
         "/ ?",
-        "Shift"
+        "Shift",
+        "Fn"
       ],
       "colors": [
+        "__body_color__",
         "__body_color__",
         "__body_color__",
         "__body_color__",
@@ -137,17 +139,13 @@
     },
     {
       "keys": [
-        "Fn",
         "Alt Opt",
         "◇",
         "スペース",
         "◇",
-        "Alt Opt",
-        "Fn"
+        "Alt Opt"
       ],
       "colors": [
-        "__body_color__",
-        "__body_color__",
         "__body_color__",
         "__body_color__",
         "__body_color__",
