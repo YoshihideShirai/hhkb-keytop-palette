@@ -6,10 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "check": "biome check .",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
     "test": "vitest run",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.7",
     "typescript": "^5.9.2",
     "vite": "^7.0.6",
     "vitest": "^4.1.10"

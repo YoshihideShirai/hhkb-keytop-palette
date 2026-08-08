@@ -14,7 +14,9 @@ export const elements = {
   resetButton: queryElement<HTMLButtonElement>("#resetButton"),
   saveButton: queryElement<HTMLButtonElement>("#saveButton"),
   loadButton: queryElement<HTMLButtonElement>("#loadButton"),
-  downloadPresetButton: queryElement<HTMLButtonElement>("#downloadPresetButton"),
+  downloadPresetButton: queryElement<HTMLButtonElement>(
+    "#downloadPresetButton",
+  ),
   uploadPresetButton: queryElement<HTMLButtonElement>("#uploadPresetButton"),
   uploadPresetInput: queryElement<HTMLInputElement>("#uploadPresetInput"),
   xShareButton: queryElement<HTMLButtonElement>("#xShareButton"),

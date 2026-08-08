@@ -1,5 +1,10 @@
 import { productAppearances } from "./products";
-import type { CompactSavedState, LayoutName, ProductId, SavedState } from "./types";
+import type {
+  CompactSavedState,
+  LayoutName,
+  ProductId,
+  SavedState,
+} from "./types";
 
 function toBase64Url(value: string): string {
   return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -18,10 +23,16 @@ function decodeColorToken(color: string): string {
   return /^[\da-f]{6}$/i.test(color) ? `#${color}` : color;
 }
 
-export function serializeDesignParam(keyColors: string[], currentLayout: LayoutName, currentProduct: ProductId): string {
+export function serializeDesignParam(
+  keyColors: string[],
+  currentLayout: LayoutName,
+  currentProduct: ProductId,
+): string {
   const dictionary = Array.from(new Set(keyColors));
   const indexes = keyColors.map((color) => dictionary.indexOf(color));
-  const productIndex = productAppearances.findIndex((product) => product.id === currentProduct);
+  const productIndex = productAppearances.findIndex(
+    (product) => product.id === currentProduct,
+  );
   const compact: CompactSavedState = {
     v: 1,
     l: currentLayout === "jis" ? "j" : "u",
@@ -32,8 +43,13 @@ export function serializeDesignParam(keyColors: string[], currentLayout: LayoutN
   return toBase64Url(JSON.stringify(compact));
 }
 
-export function deserializeDesignParam(value: string): SavedState | string[] | null {
-  const stored = JSON.parse(fromBase64Url(value)) as CompactSavedState | SavedState | string[];
+export function deserializeDesignParam(
+  value: string,
+): SavedState | string[] | null {
+  const stored = JSON.parse(fromBase64Url(value)) as
+    | CompactSavedState
+    | SavedState
+    | string[];
 
   if (Array.isArray(stored)) {
     return stored;
@@ -46,7 +62,10 @@ export function deserializeDesignParam(value: string): SavedState | string[] | n
     }
 
     const dictionary = compact.d.map(decodeColorToken);
-    const colors = Array.from(fromBase64Url(compact.i), (char) => dictionary[char.charCodeAt(0)]);
+    const colors = Array.from(
+      fromBase64Url(compact.i),
+      (char) => dictionary[char.charCodeAt(0)],
+    );
     if (colors.some((color) => typeof color !== "string")) {
       return null;
     }
@@ -54,7 +73,8 @@ export function deserializeDesignParam(value: string): SavedState | string[] | n
     const productIndex = compact.m ? parseInt(compact.m, 36) : 0;
     return {
       layout: compact.l === "j" ? "jis" : "us",
-      product: productAppearances[Number.isNaN(productIndex) ? 0 : productIndex]?.id,
+      product:
+        productAppearances[Number.isNaN(productIndex) ? 0 : productIndex]?.id,
       colors,
     };
   }

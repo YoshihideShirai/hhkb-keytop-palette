@@ -1,7 +1,10 @@
-import { presetFromRows, type FixedPresetModule } from "./preset-format";
+import { type FixedPresetModule, presetFromRows } from "./preset-format";
 import type { LayoutName, Preset } from "./types";
 
-const fixedPresetModules = import.meta.glob<FixedPresetModule>("./presets/*.json", { eager: true });
+const fixedPresetModules = import.meta.glob<FixedPresetModule>(
+  "./presets/*.json",
+  { eager: true },
+);
 
 const fixedPresetsByLayout = Object.entries(fixedPresetModules)
   .sort(([a], [b]) => a.localeCompare(b))
@@ -13,4 +16,5 @@ const fixedPresetsByLayout = Object.entries(fixedPresetModules)
     { us: [], jis: [] },
   );
 
-export const presetsByLayout: Record<LayoutName, Preset[]> = fixedPresetsByLayout;
+export const presetsByLayout: Record<LayoutName, Preset[]> =
+  fixedPresetsByLayout;

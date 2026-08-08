@@ -138,20 +138,8 @@
       ]
     },
     {
-      "keys": [
-        "Alt Opt",
-        "◇",
-        "スペース",
-        "◇",
-        "Alt Opt"
-      ],
-      "colors": [
-        "#f1c6c9",
-        "#f1c6c9",
-        "#f8f7f2",
-        "#b8c58a",
-        "#b8c58a"
-      ]
+      "keys": ["Alt Opt", "◇", "スペース", "◇", "Alt Opt"],
+      "colors": ["#f1c6c9", "#f1c6c9", "#f8f7f2", "#b8c58a", "#b8c58a"]
     }
   ]
 }
