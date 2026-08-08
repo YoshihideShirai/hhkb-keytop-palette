@@ -47,10 +47,10 @@ const {
 } = elements;
 
 let selected = colors[0];
-let keyColors: string[] = [];
+let keyColors: ColorDefinition[] = [];
 let currentLayout: LayoutName = "us";
 let currentProduct: ProductId = "hybrid-type-s-white";
-let savedDesigns: Partial<Record<LayoutName, string[]>> = {};
+let savedDesigns: Partial<Record<LayoutName, ColorDefinition[]>> = {};
 let toastTimer: number | undefined;
 
 const defaultProduct: ProductId = "hybrid-type-s-white";
@@ -78,16 +78,32 @@ function resolveColor(color: ColorDefinition, key?: KeyContext): string {
   return key ? defaultColorForKey(key) : currentProductAppearance().keyColor;
 }
 
+function resolvedKeyColors(): string[] {
+  const contexts = currentKeyContexts();
+  return keyColors.map((color, index) => resolveColor(color, contexts[index]));
+}
+
 function renderKeyboard(): void {
+  const contexts = currentKeyContexts();
+  const displayKeyColors = resolvedKeyColors();
+
   renderKeyboardElement({
     keyboard,
     layout: currentLayout,
-    keyColors,
+    keyColors: displayKeyColors,
     product: currentProductAppearance(),
     defaultColorForKey,
     resolveSelectedColor: (key) => resolveColor(selected.value, key),
     onKeyColorsChange: (nextKeyColors) => {
-      keyColors = nextKeyColors;
+      keyColors = nextKeyColors.map((color, index) => {
+        if (color === displayKeyColors[index]) {
+          return keyColors[index];
+        }
+
+        return selected.value === bodyColor && color === resolveColor(bodyColor, contexts[index])
+          ? bodyColor
+          : color;
+      });
       syncUserChangeToUrl();
       renderKeyboard();
     },
@@ -126,7 +142,7 @@ function renderPresets(): void {
     button.className = "preset";
     button.innerHTML = `<span><strong>${preset.name}</strong><small>${preset.sub}</small></span><span class="preset-colors">${preset.colors.map((color) => `<i style="--color:${resolveColor(color)}"></i>`).join("")}</span>`;
     button.addEventListener("click", () => {
-      keyColors = currentKeyContexts().map((key) => resolveColor(preset.make(key), key));
+      keyColors = currentKeyContexts().map((key) => preset.make(key));
       syncUserChangeToUrl();
       renderKeyboard();
       toast(`${preset.name} を適用しました`);
@@ -135,8 +151,8 @@ function renderPresets(): void {
   });
 }
 
-function defaultColors(): string[] {
-  return currentKeyContexts().map(defaultColorForKey);
+function defaultColors(): ColorDefinition[] {
+  return currentKeyContexts().map(() => bodyColor);
 }
 
 function save(): boolean {
@@ -160,7 +176,7 @@ function renderLayoutControls(): void {
 function applyStoredDesign(stored: SavedState | string[] | null): boolean {
   let nextLayout: LayoutName = "us";
   let nextProduct: ProductId = defaultProduct;
-  let nextSavedDesigns: Partial<Record<LayoutName, string[]>> = {};
+  let nextSavedDesigns: Partial<Record<LayoutName, ColorDefinition[]>> = {};
 
   if (Array.isArray(stored)) {
     nextSavedDesigns.us = stored;
@@ -338,8 +354,7 @@ function applyUploadedPreset(preset: FixedPresetDefinition): void {
   savedDesigns[currentLayout] = keyColors;
   currentLayout = preset.layout;
 
-  const contexts = currentKeyContexts();
-  keyColors = preset.rows.flatMap((row) => row.colors).map((color, index) => resolveColor(color, contexts[index]));
+  keyColors = preset.rows.flatMap((row) => row.colors);
   savedDesigns[currentLayout] = keyColors;
 
   renderLayoutControls();
