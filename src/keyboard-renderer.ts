@@ -58,6 +58,10 @@ export interface RenderKeyboardOptions {
   onKeyColorsChange: (keyColors: string[]) => void;
 }
 
+export function keyClassName(width: number, className = ""): string {
+  return `key${width >= 2 ? " key-wide" : ""}${width === 0 ? " key-zero-width" : ""}${className ? ` ${className}` : ""}`;
+}
+
 export function renderKeyboard({
   keyboard,
   layout,
@@ -93,7 +97,7 @@ export function renderKeyboard({
       };
       const key = document.createElement("button");
       key.type = "button";
-      key.className = `key${width >= 2 ? " key-wide" : ""}${className ? ` ${className}` : ""}`;
+      key.className = keyClassName(width, className);
       key.setAttribute("aria-label", label ? `${label} キー` : "スペースキー");
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);

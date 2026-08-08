@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { layouts } from "./catalog";
 import { deserializeDesignParam, serializeDesignParam } from "./design-codec";
-import { accessibleLegend, keyContextsForLayout } from "./keyboard-renderer";
+import {
+  accessibleLegend,
+  keyClassName,
+  keyContextsForLayout,
+} from "./keyboard-renderer";
 import { parseUploadedPreset, serializePresetFile } from "./preset-file";
 import {
   defaultProductForSeries,
@@ -43,6 +47,21 @@ function fixedPresetRows(
 }
 
 describe("design URL codec", () => {
+  it("keeps the reported JIS share URL compatible with the physical layout", () => {
+    const reportedDesign =
+      "eyJ2IjoxLCJsIjoiaiIsIm0iOiI5IiwiZCI6WyJfX2JvZHlfY29sb3JfXyJdLCJpIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEifQ";
+    const decoded = deserializeDesignParam(reportedDesign);
+
+    expect(decoded).not.toBeNull();
+    expect(Array.isArray(decoded)).toBe(false);
+    if (!decoded || Array.isArray(decoded)) return;
+
+    expect(decoded.layout).toBe("jis");
+    expect(decoded.product).toBe("classic-white");
+    expect(decoded.colors).toHaveLength(73);
+    expect(layouts.jis.rows.flat()).toHaveLength(73);
+  });
+
   it("round-trips the compact share format without losing layout, product, or key colors", () => {
     const colors = colorsForLayout("jis");
     const encoded = serializeDesignParam(colors, "jis", "classic-type-s-snow");
@@ -171,6 +190,11 @@ describe("catalog helper boundaries", () => {
 });
 
 describe("keyboard context helpers", () => {
+  it("only collapses spacers whose declared width is exactly zero", () => {
+    expect(keyClassName(0, "spacer")).toContain("key-zero-width");
+    expect(keyClassName(0.25, "spacer")).not.toContain("key-zero-width");
+  });
+
   it("matches the catalog shape and keeps accessible labels in row-major order", () => {
     const contexts = keyContextsForLayout("us");
 
