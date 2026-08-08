@@ -266,7 +266,7 @@ function syncUserChangeToUrl(): void {
 function shareOnX(): void {
   const intentUrl = new URL("https://twitter.com/intent/tweet");
   intentUrl.searchParams.set("url", currentShareUrl());
-  intentUrl.searchParams.set("text", "#HHKB #HHKBKeytopPallet");
+  intentUrl.searchParams.set("text", "#HHKB #HHKBKeytopPalette");
   window.open(intentUrl.href, "_blank", "noopener,noreferrer");
 }
 
