@@ -52,6 +52,7 @@ const {
   uploadPresetButton,
   uploadPresetInput,
   xShareButton,
+  xShareCtaButton,
   shareButton,
   menuButton,
   headerMenu,
@@ -260,6 +261,17 @@ function currentShareUrl(): string {
 
 function syncUserChangeToUrl(): void {
   updateUrl();
+}
+
+function shareOnX(): void {
+  const intentUrl = new URL("https://twitter.com/intent/tweet");
+  intentUrl.searchParams.set("url", currentShareUrl());
+  intentUrl.searchParams.set(
+    "text",
+    "HHKB Keytop Paletteで、あなただけの配色を作りました",
+  );
+  intentUrl.searchParams.set("hashtags", "hhkb");
+  window.open(intentUrl.href, "_blank", "noopener,noreferrer");
 }
 
 function toast(message: string): void {
@@ -565,13 +577,8 @@ function bindEvents(): void {
     uploadPresetInput.value = "";
   });
 
-  xShareButton.addEventListener("click", () => {
-    const intentUrl = new URL("https://twitter.com/intent/tweet");
-    intentUrl.searchParams.set("url", currentShareUrl());
-    intentUrl.searchParams.set("text", "HHKB Keytop Paletteで配色を作りました");
-    intentUrl.searchParams.set("hashtags", "hhkb");
-    window.open(intentUrl.href, "_blank", "noopener,noreferrer");
-  });
+  xShareButton.addEventListener("click", shareOnX);
+  xShareCtaButton.addEventListener("click", shareOnX);
 
   shareButton.addEventListener("click", async () => {
     const shareUrl = currentShareUrl();

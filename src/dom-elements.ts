@@ -20,6 +20,7 @@ export const elements = {
   uploadPresetButton: queryElement<HTMLButtonElement>("#uploadPresetButton"),
   uploadPresetInput: queryElement<HTMLInputElement>("#uploadPresetInput"),
   xShareButton: queryElement<HTMLButtonElement>("#xShareButton"),
+  xShareCtaButton: queryElement<HTMLButtonElement>("#xShareCtaButton"),
   shareButton: queryElement<HTMLButtonElement>("#shareButton"),
   menuButton: queryElement<HTMLButtonElement>("#menuButton"),
   headerMenu: queryElement<HTMLDivElement>("#headerMenu"),
