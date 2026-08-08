@@ -19,9 +19,18 @@ export interface KeyLegend {
   accessibleLabel?: string;
 }
 
-export type KeyDefinition = readonly [legend: KeyLegend, width: number, className?: string];
+export type KeyDefinition = readonly [
+  legend: KeyLegend,
+  width: number,
+  className?: string,
+];
 export type LayoutName = "us" | "jis";
-export type ProductSeries = "HYBRID Type-S" | "HYBRID" | "Classic Type-S" | "Classic" | "Studio";
+export type ProductSeries =
+  | "HYBRID Type-S"
+  | "HYBRID"
+  | "Classic Type-S"
+  | "Classic"
+  | "Studio";
 export type ProductId =
   | "hybrid-type-s-sumi"
   | "hybrid-type-s-white"
@@ -75,7 +84,12 @@ export interface ProductAppearance {
   detail: string;
 }
 
-export const legendVariants = ["standard-corner", "snow-center", "anniversary-center", "studio-center"] as const;
+export const legendVariants = [
+  "standard-corner",
+  "snow-center",
+  "anniversary-center",
+  "studio-center",
+] as const;
 export type LegendVariant = (typeof legendVariants)[number];
 
 export interface SavedState {

@@ -1,4 +1,9 @@
-import { bodyColor, type ColorDefinition, type LayoutName, type Preset } from "./types";
+import {
+  bodyColor,
+  type ColorDefinition,
+  type LayoutName,
+  type Preset,
+} from "./types";
 
 export interface FixedPresetDefinition {
   name: string;
@@ -24,6 +29,7 @@ export function presetFromRows(definition: FixedPresetDefinition): Preset {
     name: definition.name,
     sub: definition.sub,
     colors: colors.length > 0 ? colors : [bodyColor],
-    make: ({ rowIndex, columnIndex }) => definition.rows[rowIndex]?.colors[columnIndex] ?? bodyColor,
+    make: ({ rowIndex, columnIndex }) =>
+      definition.rows[rowIndex]?.colors[columnIndex] ?? bodyColor,
   };
 }

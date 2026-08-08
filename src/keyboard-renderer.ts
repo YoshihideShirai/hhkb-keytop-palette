@@ -1,9 +1,20 @@
 import { layouts } from "./catalog";
 import { textColor } from "./key-utils";
-import type { KeyContext, KeyIcon, KeyLegend, LayoutName, ProductAppearance } from "./types";
+import type {
+  KeyContext,
+  KeyIcon,
+  KeyLegend,
+  LayoutName,
+  ProductAppearance,
+} from "./types";
 
 export function accessibleLegend(legend: KeyLegend): string {
-  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.front, legend.symbol, legend.icon].filter(Boolean).join(" ");
+  return (
+    legend.accessibleLabel ??
+    [legend.primary, legend.secondary, legend.front, legend.symbol, legend.icon]
+      .filter(Boolean)
+      .join(" ")
+  );
 }
 
 export function keyContextsForLayout(layout: LayoutName): KeyContext[] {
@@ -16,7 +27,7 @@ export function keyContextsForLayout(layout: LayoutName): KeyContext[] {
       rowLength: row.length,
       label: accessibleLegend(legend),
       className,
-    }))
+    })),
   );
 }
 
@@ -28,7 +39,10 @@ function createLegendIcon(icon: KeyIcon): SVGSVGElement {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("focusable", "false");
   svg.setAttribute("aria-hidden", "true");
-  use.setAttribute("href", `${new URL("key-icons.svg", document.baseURI).toString()}#legend-${icon}`);
+  use.setAttribute(
+    "href",
+    `${new URL("key-icons.svg", document.baseURI).toString()}#legend-${icon}`,
+  );
   svg.append(use);
 
   return svg;
@@ -56,7 +70,10 @@ export function renderKeyboard({
   keyboard.innerHTML = "";
   keyboard.className = `keyboard keyboard-${layout} keyboard-${product.caseStyle} keyboard-product-${product.id} legend-${product.legendVariant}`;
   keyboard.style.setProperty("--case-color", product.colorValue);
-  keyboard.style.setProperty("--case-shadow", textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816");
+  keyboard.style.setProperty(
+    "--case-shadow",
+    textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816",
+  );
   let index = 0;
 
   layouts[layout].rows.forEach((row, rowIndex) => {
@@ -66,15 +83,33 @@ export function renderKeyboard({
     row.forEach(([legend, width, className = ""], columnIndex) => {
       const currentIndex = index++;
       const label = accessibleLegend(legend);
-      const keyContext = { index: currentIndex, rowIndex, columnIndex, rowLength: row.length, label, className };
+      const keyContext = {
+        index: currentIndex,
+        rowIndex,
+        columnIndex,
+        rowLength: row.length,
+        label,
+        className,
+      };
       const key = document.createElement("button");
       key.type = "button";
       key.className = `key${width >= 2 ? " key-wide" : ""}${className ? ` ${className}` : ""}`;
       key.setAttribute("aria-label", label ? `${label} キー` : "スペースキー");
       key.style.setProperty("--w", String(width));
       key.style.setProperty("--key-color", keyColors[currentIndex]);
-      key.style.setProperty("--legend-color", keyColors[currentIndex] === product.keyColor ? product.legendColor : textColor(keyColors[currentIndex]));
-      key.style.setProperty("--legend-opacity", keyColors[currentIndex] === product.keyColor && product.legendContrast === "low" ? ".48" : ".82");
+      key.style.setProperty(
+        "--legend-color",
+        keyColors[currentIndex] === product.keyColor
+          ? product.legendColor
+          : textColor(keyColors[currentIndex]),
+      );
+      key.style.setProperty(
+        "--legend-opacity",
+        keyColors[currentIndex] === product.keyColor &&
+          product.legendContrast === "low"
+          ? ".48"
+          : ".82",
+      );
       const keySide = document.createElement("span");
       keySide.className = "key-side";
       keySide.setAttribute("aria-hidden", "true");
@@ -118,7 +153,10 @@ export function renderKeyboard({
       key.addEventListener("click", () => {
         const selectedColor = resolveSelectedColor(keyContext);
         const nextKeyColors = [...keyColors];
-        nextKeyColors[currentIndex] = keyColors[currentIndex] === selectedColor ? defaultColorForKey(keyContext) : selectedColor;
+        nextKeyColors[currentIndex] =
+          keyColors[currentIndex] === selectedColor
+            ? defaultColorForKey(keyContext)
+            : selectedColor;
         onKeyColorsChange(nextKeyColors);
       });
       rowElement.append(key);
@@ -141,7 +179,9 @@ export function renderKeyboard({
 
   const badge = document.createElement("span");
   badge.className = "keyboard-badge";
-  badge.textContent = product.series.startsWith("HYBRID") ? "HHKB Professional HYBRID" : "HHKB";
+  badge.textContent = product.series.startsWith("HYBRID")
+    ? "HHKB Professional HYBRID"
+    : "HHKB";
   badge.setAttribute("aria-hidden", "true");
   keyboard.append(badge);
 
@@ -153,5 +193,8 @@ export function renderKeyboard({
     keyboard.append(gradeBadge);
   }
 
-  keyboard.setAttribute("aria-label", `HHKB ${product.series} ${product.colorName} ${layouts[layout].name}`);
+  keyboard.setAttribute(
+    "aria-label",
+    `HHKB ${product.series} ${product.colorName} ${layouts[layout].name}`,
+  );
 }

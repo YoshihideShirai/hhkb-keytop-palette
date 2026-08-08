@@ -138,13 +138,7 @@
       ]
     },
     {
-      "keys": [
-        "Alt Opt",
-        "◇",
-        "スペース",
-        "◇",
-        "Alt Opt"
-      ],
+      "keys": ["Alt Opt", "◇", "スペース", "◇", "Alt Opt"],
       "colors": [
         "__body_color__",
         "__body_color__",
