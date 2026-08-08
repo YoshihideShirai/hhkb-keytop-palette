@@ -1,7 +1,11 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 import { colors, keytop, layouts } from "./catalog";
-import { isWhiteProduct, isWhiteProductSpecialKey, textColor } from "./key-utils";
+import { deserializeDesignParam, serializeDesignParam } from "./design-codec";
+import { elements } from "./dom-elements";
+import { isWhiteProduct, isWhiteProductSpecialKey } from "./key-utils";
+import { keyContextsForLayout, renderKeyboard as renderKeyboardElement } from "./keyboard-renderer";
+import { parseUploadedPreset, presetFileName, serializePresetFile } from "./preset-file";
 import type { FixedPresetDefinition } from "./preset-format";
 import { presetsByLayout } from "./presets";
 import { productAppearances, productSeries } from "./products";
@@ -9,150 +13,54 @@ import {
   bodyColor,
   type ColorDefinition,
   type ColorOption,
-  type CompactSavedState,
   type KeyContext,
-  type KeyDefinition,
-  type KeyIcon,
-  type KeyLegend,
   type LayoutName,
   type ProductAppearance,
   type ProductId,
   type ProductSeries,
   type SavedState,
 } from "./types";
-import { queryElement } from "./utils/dom";
+import { defaultProductForSeries, isLayoutName, isProductId, productsForSeries } from "./product-helpers";
 
-const keyboard = queryElement<HTMLDivElement>("#keyboard");
-const palette = queryElement<HTMLDivElement>("#palette");
-const modelSeries = queryElement<HTMLDivElement>("#modelSeries");
-const bodyColors = queryElement<HTMLDivElement>("#bodyColors");
-const presetsToggle = queryElement<HTMLButtonElement>("#presetsToggle");
-const presetContainer = queryElement<HTMLDivElement>("#presets");
-const selectedSwatch = queryElement<HTMLSpanElement>("#selectedSwatch");
-const selectionText = queryElement<HTMLSpanElement>("#selectionText");
-const customColor = queryElement<HTMLInputElement>("#customColor");
-const customColorValue = queryElement<HTMLOutputElement>("#customColorValue");
-const resetButton = queryElement<HTMLButtonElement>("#resetButton");
-const saveButton = queryElement<HTMLButtonElement>("#saveButton");
-const loadButton = queryElement<HTMLButtonElement>("#loadButton");
-const downloadPresetButton = queryElement<HTMLButtonElement>("#downloadPresetButton");
-const uploadPresetButton = queryElement<HTMLButtonElement>("#uploadPresetButton");
-const uploadPresetInput = queryElement<HTMLInputElement>("#uploadPresetInput");
-const xShareButton = queryElement<HTMLButtonElement>("#xShareButton");
-const shareButton = queryElement<HTMLButtonElement>("#shareButton");
-const menuButton = queryElement<HTMLButtonElement>("#menuButton");
-const headerMenu = queryElement<HTMLDivElement>("#headerMenu");
-const toastElement = queryElement<HTMLDivElement>("#toast");
+const {
+  keyboard,
+  palette,
+  modelSeries,
+  bodyColors,
+  presetsToggle,
+  presetContainer,
+  selectedSwatch,
+  selectionText,
+  customColor,
+  customColorValue,
+  resetButton,
+  saveButton,
+  loadButton,
+  downloadPresetButton,
+  uploadPresetButton,
+  uploadPresetInput,
+  xShareButton,
+  shareButton,
+  menuButton,
+  headerMenu,
+  toastElement,
+} = elements;
 
 let selected = colors[0];
-
-function setHeaderMenuOpen(open: boolean, restoreFocus = false) {
-  menuButton.setAttribute("aria-expanded", String(open));
-  headerMenu.hidden = !open;
-
-  if (open) {
-    headerMenu.querySelector<HTMLElement>("button, a[href]")?.focus();
-  } else if (restoreFocus) {
-    menuButton.focus();
-  }
-}
-
-menuButton.addEventListener("click", () => {
-  setHeaderMenuOpen(menuButton.getAttribute("aria-expanded") !== "true");
-});
-
-headerMenu.addEventListener("click", (event) => {
-  if (event.target instanceof Element && event.target.closest("button, a[href]")) setHeaderMenuOpen(false, true);
-});
-
-document.addEventListener("click", (event) => {
-  if (menuButton.getAttribute("aria-expanded") === "true" && event.target instanceof Element && !event.target.closest(".header-actions")) {
-    setHeaderMenuOpen(false, true);
-  }
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
-    setHeaderMenuOpen(false, true);
-  }
-});
-
-setHeaderMenuOpen(false);
 let keyColors: string[] = [];
 let currentLayout: LayoutName = "us";
 let currentProduct: ProductId = "hybrid-type-s-white";
 let savedDesigns: Partial<Record<LayoutName, string[]>> = {};
 let toastTimer: number | undefined;
+
 const defaultProduct: ProductId = "hybrid-type-s-white";
-const bodyColorOrder = ["白", "墨", "雪"];
-
-function setPresetsExpanded(expanded: boolean): void {
-  presetsToggle.setAttribute("aria-expanded", String(expanded));
-  presetContainer.hidden = !expanded;
-}
-
-presetsToggle.addEventListener("click", () => {
-  setPresetsExpanded(presetsToggle.getAttribute("aria-expanded") !== "true");
-});
-
-function isLayoutName(value: unknown): value is LayoutName {
-  return typeof value === "string" && value in layouts;
-}
-
-function isProductId(value: unknown): value is ProductId {
-  return typeof value === "string" && productAppearances.some((product) => product.id === value);
-}
 
 function currentProductAppearance(): ProductAppearance {
   return productAppearances.find((product) => product.id === currentProduct) ?? productAppearances[0];
 }
 
-function productsForCurrentSeries(): ProductAppearance[] {
-  const currentSeries = currentProductAppearance().series;
-  return productAppearances
-    .filter((product) => product.series === currentSeries)
-    .sort((a, b) => bodyColorOrder.indexOf(a.colorName) - bodyColorOrder.indexOf(b.colorName));
-}
-
-function defaultProductForSeries(series: ProductSeries): ProductAppearance | undefined {
-  return productAppearances.find((product) => product.series === series && product.colorName === "白")
-    ?? productAppearances.find((product) => product.series === series);
-}
-
-function currentRows(): KeyDefinition[][] {
-  return layouts[currentLayout].rows;
-}
-
 function currentKeyContexts(): KeyContext[] {
-  let index = 0;
-  return currentRows().flatMap((row, rowIndex) =>
-    row.map(([legend, , className = ""], columnIndex) => ({
-      index: index++,
-      rowIndex,
-      columnIndex,
-      rowLength: row.length,
-      label: accessibleLegend(legend),
-      className,
-    }))
-  );
-}
-
-function accessibleLegend(legend: KeyLegend): string {
-  return legend.accessibleLabel ?? [legend.primary, legend.secondary, legend.front, legend.symbol, legend.icon].filter(Boolean).join(" ");
-}
-
-function createLegendIcon(icon: KeyIcon): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-
-  svg.setAttribute("class", "legend-icon-svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("focusable", "false");
-  svg.setAttribute("aria-hidden", "true");
-  use.setAttribute("href", `${new URL("key-icons.svg", document.baseURI).toString()}#legend-${icon}`);
-  svg.append(use);
-
-  return svg;
+  return keyContextsForLayout(currentLayout);
 }
 
 function defaultColorForKey({ label, className }: Pick<KeyContext, "label" | "className">): string {
@@ -171,108 +79,19 @@ function resolveColor(color: ColorDefinition, key?: KeyContext): string {
 }
 
 function renderKeyboard(): void {
-  const product = currentProductAppearance();
-  keyboard.innerHTML = "";
-  keyboard.className = `keyboard keyboard-${currentLayout} keyboard-${product.caseStyle} keyboard-product-${product.id} legend-${product.legendVariant}`;
-  keyboard.style.setProperty("--case-color", product.colorValue);
-  keyboard.style.setProperty("--case-shadow", textColor(product.colorValue) === "#31312e" ? "#aaa79f" : "#181816");
-  let index = 0;
-
-  currentRows().forEach((row, rowIndex) => {
-    const rowElement = document.createElement("div");
-    rowElement.className = `key-row key-row-${rowIndex + 1}`;
-
-    row.forEach(([legend, width, className = ""], columnIndex) => {
-      const currentIndex = index++;
-      const label = accessibleLegend(legend);
-      const keyContext = { index: currentIndex, rowIndex, columnIndex, rowLength: row.length, label, className };
-      const key = document.createElement("button");
-      key.type = "button";
-      key.className = `key${width >= 2 ? " key-wide" : ""}${className ? ` ${className}` : ""}`;
-      key.setAttribute("aria-label", label ? `${label} キー` : "スペースキー");
-      key.style.setProperty("--w", String(width));
-      key.style.setProperty("--key-color", keyColors[currentIndex]);
-      key.style.setProperty("--legend-color", keyColors[currentIndex] === product.keyColor ? product.legendColor : textColor(keyColors[currentIndex]));
-      key.style.setProperty("--legend-opacity", keyColors[currentIndex] === product.keyColor && product.legendContrast === "low" ? ".48" : ".82");
-      const keySide = document.createElement("span");
-      keySide.className = "key-side";
-      keySide.setAttribute("aria-hidden", "true");
-      const keyTop = document.createElement("span");
-      keyTop.className = "key-top";
-      keyTop.setAttribute("aria-hidden", "true");
-      const keyLabel = document.createElement("span");
-      keyLabel.className = "key-label";
-      if (legend.primary) {
-        const primary = document.createElement("span");
-        primary.className = "legend-primary";
-        primary.textContent = legend.primary;
-        keyLabel.append(primary);
-      }
-      if (legend.secondary) {
-        const secondary = document.createElement("span");
-        secondary.className = "legend-secondary";
-        secondary.textContent = legend.secondary;
-        keyLabel.append(secondary);
-      }
-      if (legend.front) {
-        const front = document.createElement("span");
-        front.className = "legend-front";
-        front.textContent = legend.front;
-        keyLabel.append(front);
-      }
-      if (legend.symbol) {
-        const symbol = document.createElement("span");
-        symbol.className = "legend-symbol";
-        symbol.textContent = legend.symbol;
-        keyLabel.append(symbol);
-      }
-      if (legend.icon) {
-        const icon = document.createElement("span");
-        icon.className = "legend-icon";
-        icon.append(createLegendIcon(legend.icon));
-        keyLabel.append(icon);
-      }
-      keyTop.append(keyLabel);
-      key.append(keySide, keyTop);
-      key.addEventListener("click", () => {
-        const selectedColor = resolveColor(selected.value, keyContext);
-        keyColors[currentIndex] = keyColors[currentIndex] === selectedColor ? defaultColorForKey(keyContext) : selectedColor;
-        syncUserChangeToUrl();
-        renderKeyboard();
-      });
-      rowElement.append(key);
-    });
-
-    keyboard.append(rowElement);
+  renderKeyboardElement({
+    keyboard,
+    layout: currentLayout,
+    keyColors,
+    product: currentProductAppearance(),
+    defaultColorForKey,
+    resolveSelectedColor: (key) => resolveColor(selected.value, key),
+    onKeyColorsChange: (nextKeyColors) => {
+      keyColors = nextKeyColors;
+      syncUserChangeToUrl();
+      renderKeyboard();
+    },
   });
-
-  if (product.caseStyle === "studio") {
-    const pointer = document.createElement("span");
-    pointer.className = "pointing-stick";
-    pointer.setAttribute("aria-hidden", "true");
-    keyboard.append(pointer);
-
-    const mouseButtons = document.createElement("span");
-    mouseButtons.className = "studio-mouse-buttons";
-    mouseButtons.setAttribute("aria-hidden", "true");
-    keyboard.append(mouseButtons);
-  }
-
-  const badge = document.createElement("span");
-  badge.className = "keyboard-badge";
-  badge.textContent = product.series.startsWith("HYBRID") ? "HHKB Professional HYBRID" : "HHKB";
-  badge.setAttribute("aria-hidden", "true");
-  keyboard.append(badge);
-
-  if (product.series.includes("Type-S")) {
-    const gradeBadge = document.createElement("span");
-    gradeBadge.className = "keyboard-grade-badge";
-    gradeBadge.textContent = "Type-S";
-    gradeBadge.setAttribute("aria-hidden", "true");
-    keyboard.append(gradeBadge);
-  }
-
-  keyboard.setAttribute("aria-label", `HHKB ${product.series} ${product.colorName} ${layouts[currentLayout].name}`);
 }
 
 function chooseColor(color: ColorOption, isCustom = false): void {
@@ -315,18 +134,6 @@ function renderPresets(): void {
     presetContainer.append(button);
   });
 }
-
-productSeries.forEach((series) => {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "product model-button";
-  button.dataset.series = series;
-  button.setAttribute("aria-pressed", "false");
-  const representative = defaultProductForSeries(series);
-  button.innerHTML = `<span class="product-swatch" style="--color:${representative?.colorValue ?? "#cac4b8"}"></span><span><strong>${series}</strong><small>${representative?.detail ?? ""}</small></span>`;
-  button.addEventListener("click", () => selectSeries(series));
-  modelSeries.append(button);
-});
 
 function defaultColors(): string[] {
   return currentKeyContexts().map(defaultColorForKey);
@@ -377,194 +184,16 @@ function applyStoredDesign(stored: SavedState | string[] | null): boolean {
   return true;
 }
 
-function rowsFromCurrentDesign(): string[][] {
-  let index = 0;
-  return currentRows().map((row) => row.map(() => keyColors[index++]));
-}
-
-function serializePresetFile(name: string): string {
-  const sub = `${layouts[currentLayout].name} / ${currentProductAppearance().series} ${currentProductAppearance().colorName}`;
-  const rowLabels = currentRows().map((row) => row.map(([legend]) => accessibleLegend(legend) || "スペース"));
-  const rows = rowsFromCurrentDesign().map((colors, rowIndex) => ({
-    keys: rowLabels[rowIndex],
-    colors,
-  }));
-
-  return `${JSON.stringify({ name, sub, layout: currentLayout, rows }, null, 2)}\n`;
-}
-
-function presetFileName(name: string): string {
-  const slug = name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  const timestamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "");
-  return `${slug || "hhkb-preset"}-${timestamp}.json`;
-}
-
-function downloadPresetFile(): void {
-  const name = window.prompt("プリセット名", "作成した配色")?.trim();
-  if (!name) return;
-
-  const blob = new Blob([serializePresetFile(name)], { type: "application/json;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = presetFileName(name);
-  link.click();
-  URL.revokeObjectURL(url);
-  toast("プリセットファイルをダウンロードしました");
-}
-
-function isColorDefinition(value: unknown): value is ColorDefinition {
-  return value === bodyColor || (typeof value === "string" && /^#[\da-f]{6}$/i.test(value));
-}
-
-function parseUploadedPreset(value: unknown): FixedPresetDefinition | null {
-  if (!value || typeof value !== "object") return null;
-
-  const preset = value as Partial<FixedPresetDefinition>;
-  if (typeof preset.name !== "string" || !isLayoutName(preset.layout) || !Array.isArray(preset.rows)) {
-    return null;
-  }
-
-  const layoutRows = layouts[preset.layout].rows;
-  if (preset.rows.length !== layoutRows.length) {
-    return null;
-  }
-
-  const rows = preset.rows.map((row, rowIndex) => {
-    if (!row || typeof row !== "object" || !Array.isArray(row.colors)) {
-      return null;
-    }
-
-    if (row.colors.length !== layoutRows[rowIndex].length || !row.colors.every(isColorDefinition)) {
-      return null;
-    }
-
-    return {
-      keys: Array.isArray(row.keys) && row.keys.every((key: unknown) => typeof key === "string") ? row.keys : undefined,
-      colors: row.colors,
-    };
-  });
-
-  if (rows.some((row) => row === null)) {
-    return null;
-  }
-
-  return {
-    name: preset.name.trim() || "アップロードした配色",
-    sub: typeof preset.sub === "string" ? preset.sub : "アップロードしたプリセット",
-    layout: preset.layout,
-    rows: rows as FixedPresetDefinition["rows"],
-  };
-}
-
-function applyUploadedPreset(preset: FixedPresetDefinition): void {
-  savedDesigns[currentLayout] = keyColors;
-  currentLayout = preset.layout;
-
-  const contexts = currentKeyContexts();
-  keyColors = preset.rows.flatMap((row) => row.colors).map((color, index) => resolveColor(color, contexts[index]));
-  savedDesigns[currentLayout] = keyColors;
-
-  renderLayoutControls();
-
-  renderPresets();
-  renderKeyboard();
-  syncUserChangeToUrl();
-  toast(`${preset.name} をアップロードしました`);
-}
-
-async function uploadPresetFile(file: File | undefined): Promise<void> {
-  if (!file) return;
-
-  try {
-    const preset = parseUploadedPreset(JSON.parse(await file.text()));
-    if (!preset) {
-      toast("プリセットファイルを読み込めません");
-      return;
-    }
-
-    applyUploadedPreset(preset);
-  } catch {
-    toast("プリセットファイルを読み込めません");
-  }
-}
-
-function toBase64Url(value: string): string {
-  return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function fromBase64Url(value: string): string {
-  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
-  return atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "="));
-}
-
-function encodeColorToken(color: string): string {
-  return /^#[\da-f]{6}$/i.test(color) ? color.slice(1).toLowerCase() : color;
-}
-
-function decodeColorToken(color: string): string {
-  return /^[\da-f]{6}$/i.test(color) ? `#${color}` : color;
-}
-
-function serializeDesignParam(): string {
-  const dictionary = Array.from(new Set(keyColors));
-  const indexes = keyColors.map((color) => dictionary.indexOf(color));
-  const productIndex = productAppearances.findIndex((product) => product.id === currentProduct);
-  const compact: CompactSavedState = {
-    v: 1,
-    l: currentLayout === "jis" ? "j" : "u",
-    m: Math.max(productIndex, 0).toString(36),
-    d: dictionary.map(encodeColorToken),
-    i: toBase64Url(String.fromCharCode(...indexes)),
-  };
-  return toBase64Url(JSON.stringify(compact));
-}
-
-function deserializeDesignParam(value: string): SavedState | string[] | null {
-  const stored = JSON.parse(fromBase64Url(value)) as CompactSavedState | SavedState | string[];
-
-  if (Array.isArray(stored)) {
-    return stored;
-  }
-
-  if (stored && typeof stored === "object" && "v" in stored && stored.v === 1) {
-    const compact = stored as CompactSavedState;
-    if (!Array.isArray(compact.d) || typeof compact.i !== "string") {
-      return null;
-    }
-
-    const dictionary = compact.d.map(decodeColorToken);
-    const colors = Array.from(fromBase64Url(compact.i), (char) => dictionary[char.charCodeAt(0)]);
-    if (colors.some((color) => typeof color !== "string")) {
-      return null;
-    }
-
-    const productIndex = compact.m ? parseInt(compact.m, 36) : 0;
-    return {
-      layout: compact.l === "j" ? "jis" : "us",
-      product: productAppearances[Number.isNaN(productIndex) ? 0 : productIndex]?.id,
-      colors,
-    };
-  }
-
-  return stored as SavedState;
-}
-
 function updateUrl(): void {
   const url = new URL(location.href);
-  url.searchParams.set("design", serializeDesignParam());
+  url.searchParams.set("design", serializeDesignParam(keyColors, currentLayout, currentProduct));
   history.replaceState(null, "", url);
 }
 
 function currentShareUrl(): string {
   updateUrl();
   const url = new URL(location.pathname, location.origin);
-  url.searchParams.set("design", serializeDesignParam());
+  url.searchParams.set("design", serializeDesignParam(keyColors, currentLayout, currentProduct));
   return url.href;
 }
 
@@ -651,7 +280,7 @@ function renderAppearanceControls(): void {
   });
 
   bodyColors.innerHTML = "";
-  productsForCurrentSeries().forEach((product) => {
+  productsForSeries(current.series).forEach((product) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "body-color";
@@ -680,7 +309,7 @@ function selectLayout(layout: string | undefined): void {
   savedDesigns[currentLayout] = keyColors;
   currentLayout = layout;
   const saved = savedDesigns[currentLayout];
-  keyColors = Array.isArray(saved) && saved.length === currentRows().flat().length ? saved : defaultColors();
+  keyColors = Array.isArray(saved) && saved.length === layouts[currentLayout].rows.flat().length ? saved : defaultColors();
 
   renderLayoutControls();
 
@@ -690,62 +319,172 @@ function selectLayout(layout: string | undefined): void {
   toast(`${layouts[currentLayout].name}に切り替えました`);
 }
 
-document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
-  button.addEventListener("click", () => selectLayout(button.dataset.layout));
-});
+function downloadPresetFile(): void {
+  const name = window.prompt("プリセット名", "作成した配色")?.trim();
+  if (!name) return;
 
-customColor.addEventListener("input", (event) => {
-  const value = (event.target as HTMLInputElement).value.toUpperCase();
-  customColorValue.value = value;
-  chooseColor({ name: value, value }, true);
-});
+  const blob = new Blob([serializePresetFile(name, currentLayout, currentProductAppearance(), keyColors)], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
 
-resetButton.addEventListener("click", () => {
-  keyColors = defaultColors();
-  syncUserChangeToUrl();
+  link.href = url;
+  link.download = presetFileName(name);
+  link.click();
+  URL.revokeObjectURL(url);
+  toast("プリセットファイルをダウンロードしました");
+}
+
+function applyUploadedPreset(preset: FixedPresetDefinition): void {
+  savedDesigns[currentLayout] = keyColors;
+  currentLayout = preset.layout;
+
+  const contexts = currentKeyContexts();
+  keyColors = preset.rows.flatMap((row) => row.colors).map((color, index) => resolveColor(color, contexts[index]));
+  savedDesigns[currentLayout] = keyColors;
+
+  renderLayoutControls();
+
+  renderPresets();
   renderKeyboard();
-  toast("デザインをリセットしました");
-});
+  syncUserChangeToUrl();
+  toast(`${preset.name} をアップロードしました`);
+}
 
-saveButton.addEventListener("click", () => {
-  const persisted = save();
-  toast(persisted ? "ブラウザに保存しました" : "ブラウザ保存は利用できません");
-});
-
-loadButton.addEventListener("click", loadBrowserSavedDesign);
-
-downloadPresetButton.addEventListener("click", downloadPresetFile);
-
-uploadPresetButton.addEventListener("click", () => {
-  uploadPresetInput.click();
-});
-
-uploadPresetInput.addEventListener("change", () => {
-  void uploadPresetFile(uploadPresetInput.files?.[0]);
-  uploadPresetInput.value = "";
-});
-
-xShareButton.addEventListener("click", () => {
-  const intentUrl = new URL("https://twitter.com/intent/tweet");
-  intentUrl.searchParams.set("url", currentShareUrl());
-  intentUrl.searchParams.set("text", "HHKB Keytop Paletteで配色を作りました");
-  intentUrl.searchParams.set("hashtags", "hhkb");
-  window.open(intentUrl.href, "_blank", "noopener,noreferrer");
-});
-
-shareButton.addEventListener("click", async () => {
-  const shareUrl = currentShareUrl();
+async function uploadPresetFile(file: File | undefined): Promise<void> {
+  if (!file) return;
 
   try {
-    await navigator.clipboard.writeText(shareUrl);
-    toast("共有URLをコピーしました");
-  } catch {
-    window.prompt("このURLをコピーしてください", shareUrl);
-  }
-});
+    const preset = parseUploadedPreset(JSON.parse(await file.text()));
+    if (!preset) {
+      toast("プリセットファイルを読み込めません");
+      return;
+    }
 
-load();
-selectProduct(currentProduct);
-renderLayoutControls();
-chooseColor(selected);
-renderKeyboard();
+    applyUploadedPreset(preset);
+  } catch {
+    toast("プリセットファイルを読み込めません");
+  }
+}
+
+function setHeaderMenuOpen(open: boolean, restoreFocus = false): void {
+  menuButton.setAttribute("aria-expanded", String(open));
+  headerMenu.hidden = !open;
+
+  if (open) {
+    headerMenu.querySelector<HTMLElement>("button, a[href]")?.focus();
+  } else if (restoreFocus) {
+    menuButton.focus();
+  }
+}
+
+function setPresetsExpanded(expanded: boolean): void {
+  presetsToggle.setAttribute("aria-expanded", String(expanded));
+  presetContainer.hidden = !expanded;
+}
+
+function renderProductSeriesControls(): void {
+  productSeries.forEach((series) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "product model-button";
+    button.dataset.series = series;
+    button.setAttribute("aria-pressed", "false");
+    const representative = defaultProductForSeries(series);
+    button.innerHTML = `<span class="product-swatch" style="--color:${representative?.colorValue ?? "#cac4b8"}"></span><span><strong>${series}</strong><small>${representative?.detail ?? ""}</small></span>`;
+    button.addEventListener("click", () => selectSeries(series));
+    modelSeries.append(button);
+  });
+}
+
+function bindEvents(): void {
+  menuButton.addEventListener("click", () => {
+    setHeaderMenuOpen(menuButton.getAttribute("aria-expanded") !== "true");
+  });
+
+  headerMenu.addEventListener("click", (event) => {
+    if (event.target instanceof Element && event.target.closest("button, a[href]")) setHeaderMenuOpen(false, true);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (menuButton.getAttribute("aria-expanded") === "true" && event.target instanceof Element && !event.target.closest(".header-actions")) {
+      setHeaderMenuOpen(false, true);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
+      setHeaderMenuOpen(false, true);
+    }
+  });
+
+  presetsToggle.addEventListener("click", () => {
+    setPresetsExpanded(presetsToggle.getAttribute("aria-expanded") !== "true");
+  });
+
+  document.querySelectorAll<HTMLButtonElement>(".layout-button").forEach((button) => {
+    button.addEventListener("click", () => selectLayout(button.dataset.layout));
+  });
+
+  customColor.addEventListener("input", (event) => {
+    const value = (event.target as HTMLInputElement).value.toUpperCase();
+    customColorValue.value = value;
+    chooseColor({ name: value, value }, true);
+  });
+
+  resetButton.addEventListener("click", () => {
+    keyColors = defaultColors();
+    syncUserChangeToUrl();
+    renderKeyboard();
+    toast("デザインをリセットしました");
+  });
+
+  saveButton.addEventListener("click", () => {
+    const persisted = save();
+    toast(persisted ? "ブラウザに保存しました" : "ブラウザ保存は利用できません");
+  });
+
+  loadButton.addEventListener("click", loadBrowserSavedDesign);
+
+  downloadPresetButton.addEventListener("click", downloadPresetFile);
+
+  uploadPresetButton.addEventListener("click", () => {
+    uploadPresetInput.click();
+  });
+
+  uploadPresetInput.addEventListener("change", () => {
+    void uploadPresetFile(uploadPresetInput.files?.[0]);
+    uploadPresetInput.value = "";
+  });
+
+  xShareButton.addEventListener("click", () => {
+    const intentUrl = new URL("https://twitter.com/intent/tweet");
+    intentUrl.searchParams.set("url", currentShareUrl());
+    intentUrl.searchParams.set("text", "HHKB Keytop Paletteで配色を作りました");
+    intentUrl.searchParams.set("hashtags", "hhkb");
+    window.open(intentUrl.href, "_blank", "noopener,noreferrer");
+  });
+
+  shareButton.addEventListener("click", async () => {
+    const shareUrl = currentShareUrl();
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast("共有URLをコピーしました");
+    } catch {
+      window.prompt("このURLをコピーしてください", shareUrl);
+    }
+  });
+}
+
+function initialize(): void {
+  renderProductSeriesControls();
+  bindEvents();
+  setHeaderMenuOpen(false);
+  load();
+  selectProduct(currentProduct);
+  renderLayoutControls();
+  chooseColor(selected);
+  renderKeyboard();
+}
+
+initialize();
