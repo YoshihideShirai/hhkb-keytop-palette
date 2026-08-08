@@ -188,7 +188,7 @@ export const layouts: Record<LayoutName, Layout> = {
       ],
       [
         key("Fn", 1, "legend-center-left"),
-        [blankLegend, 0.5, "spacer"],
+        [blankLegend, 0.25, "spacer"],
         icon(
           "hhkb-mark",
           "半角/全角",
@@ -203,6 +203,7 @@ export const layouts: Record<LayoutName, Layout> = {
         key("Kana", 1, undefined, undefined, "かな"),
         key("Alt", 1, "legend-modifier-stack", "Opt"),
         key("Fn", 1, "legend-center-left"),
+        [blankLegend, 0.25, "spacer"],
         icon("arrow-left", "←", 1, "arrow"),
         icon("arrow-down", "↓", 1, "arrow"),
         icon("arrow-right", "→", 1, "arrow"),
