@@ -53,7 +53,9 @@ describe("design URL codec", () => {
     if (!decoded || Array.isArray(decoded)) return;
 
     expect(decoded.layout).toBe("jis");
-    expect(decoded.colors).toHaveLength(layouts.jis.rows.flat().length);
+    expect(decoded.product).toBe("classic-white");
+    expect(decoded.colors).toHaveLength(73);
+    expect(layouts.jis.rows.flat()).toHaveLength(73);
   });
 
   it("round-trips the compact share format without losing layout, product, or key colors", () => {
