@@ -1071,6 +1071,45 @@ main {
 .hint i {
   margin-right: 5px;
 }
+.share-card {
+  margin-top: 24px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid color-mix(in srgb, var(--ink), #fff 84%);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f7f8fa, #fff);
+}
+.share-card-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.share-card-copy h2 {
+  margin: 1px 0 6px;
+}
+.share-card-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.share-x-button {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding-inline: 20px;
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.16);
+}
+.share-x-button:hover {
+  background: #2b2e33;
+  border-color: #2b2e33;
+  box-shadow: 0 12px 26px rgba(17, 24, 39, 0.22);
+}
 .controls-card {
   display: block;
   min-width: 0;
@@ -1559,6 +1598,16 @@ footer {
   }
   .hint {
     font-size: 9px;
+  }
+  .share-card {
+    margin-top: 20px;
+    padding: 16px;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .share-x-button {
+    width: 100%;
   }
   .toolbar-options {
     align-items: flex-end;
