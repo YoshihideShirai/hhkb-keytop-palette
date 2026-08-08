@@ -43,6 +43,19 @@ function fixedPresetRows(
 }
 
 describe("design URL codec", () => {
+  it("keeps the reported JIS share URL compatible with the physical layout", () => {
+    const reportedDesign =
+      "eyJ2IjoxLCJsIjoiaiIsIm0iOiI5IiwiZCI6WyJfX2JvZHlfY29sb3JfXyJdLCJpIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEifQ";
+    const decoded = deserializeDesignParam(reportedDesign);
+
+    expect(decoded).not.toBeNull();
+    expect(Array.isArray(decoded)).toBe(false);
+    if (!decoded || Array.isArray(decoded)) return;
+
+    expect(decoded.layout).toBe("jis");
+    expect(decoded.colors).toHaveLength(layouts.jis.rows.flat().length);
+  });
+
   it("round-trips the compact share format without losing layout, product, or key colors", () => {
     const colors = colorsForLayout("jis");
     const encoded = serializeDesignParam(colors, "jis", "classic-type-s-snow");
