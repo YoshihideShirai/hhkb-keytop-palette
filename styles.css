@@ -134,9 +134,6 @@ input:focus-visible {
 .menu-button {
   display: inline-flex;
 }
-#shareButton {
-  order: 2;
-}
 .menu-button {
   order: 3;
 }
