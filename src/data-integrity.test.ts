@@ -112,18 +112,34 @@ describe("keyboard catalog", () => {
       "かな",
       "Alt",
       "Fn",
+      "スペース",
       "←",
       "↓",
       "→",
     ]);
     expect(startPositions).toEqual([
-      0, 1, 1.5, 2.5, 3.5, 4.5, 5.5, 8, 9, 10, 11, 12, 13, 14,
+      0, 1, 1.25, 2.25, 3.25, 4.25, 5.25, 7.75, 8.75, 9.75, 10.75, 11.75, 12,
+      13, 14,
+    ]);
+
+    const fnIndexes = labels.reduce<number[]>((indexes, label, index) => {
+      if (label === "Fn") indexes.push(index);
+      return indexes;
+    }, []);
+    expect(fnIndexes.map((index) => bottomRow[index + 1]?.slice(1))).toEqual([
+      [0.25, "spacer"],
+      [0.25, "spacer"],
     ]);
 
     const upArrowPosition = layouts.jis.rows[3]
       .slice(0, -2)
       .reduce((total, [, width]) => total + width, 0);
-    expect(upArrowPosition).toBe(startPositions[12]);
+    const [leftArrowPosition, downArrowPosition, rightArrowPosition] =
+      startPositions.slice(-3);
+    expect([leftArrowPosition, downArrowPosition, rightArrowPosition]).toEqual([
+      12, 13, 14,
+    ]);
+    expect(upArrowPosition).toBe(downArrowPosition);
   });
 
   it("keeps row unit widths aligned to the HHKB key grid", () => {
