@@ -91,6 +91,41 @@ describe("keyboard catalog", () => {
     expect(bottomRowWidths).toEqual([1, 1.5, 6, 1.5, 1]);
   });
 
+  it("matches the physical JIS bottom-row key positions and arrow cluster", () => {
+    const bottomRow = layouts.jis.rows[4];
+    const labels = bottomRow.map(
+      ([legend]) => legend.accessibleLabel ?? legend.primary,
+    );
+    const startPositions = bottomRow.map((_, index) =>
+      bottomRow.slice(0, index).reduce((total, [, width]) => total + width, 0),
+    );
+
+    expect(labels).toEqual([
+      "Fn",
+      "スペース",
+      "半角/全角",
+      "◇",
+      "Alt",
+      "無変換",
+      "スペース",
+      "変換",
+      "かな",
+      "Alt",
+      "Fn",
+      "←",
+      "↓",
+      "→",
+    ]);
+    expect(startPositions).toEqual([
+      0, 1, 1.5, 2.5, 3.5, 4.5, 5.5, 8, 9, 10, 11, 12, 13, 14,
+    ]);
+
+    const upArrowPosition = layouts.jis.rows[3]
+      .slice(0, -2)
+      .reduce((total, [, width]) => total + width, 0);
+    expect(upArrowPosition).toBe(startPositions[12]);
+  });
+
   it("keeps row unit widths aligned to the HHKB key grid", () => {
     const rowWidths = (layoutName: LayoutName) =>
       layouts[layoutName].rows.map((row) =>
