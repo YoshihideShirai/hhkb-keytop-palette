@@ -48,7 +48,7 @@ export const layouts: Record<LayoutName, Layout> = {
       [fkey("Tab", 1.5, "legend-center-left", undefined, "Caps"), ..."QWERTYUIOP".split("").map((label) => key(label, 1)), fkey("[", 1, undefined, "{", "↑"), fkey("]", 1, undefined, "}", "PgUp"), fkey("Delete", 1.5, "legend-center-left", undefined, "BS")],
       [key("Control", 1.75, "legend-center-left"), fkey("A", 1, undefined, undefined, "Vol_Dn"), fkey("S", 1, undefined, undefined, "Vol_Up"), fkey("D", 1, undefined, undefined, "Mute"), fkey("F", 1, undefined, undefined, "Eject"), ..."GHJ".split("").map((label) => key(label, 1)), fkey("K", 1, undefined, undefined, "Home"), fkey("L", 1, undefined, undefined, "PgDn"), fkey(";", 1, undefined, ":", "←"), fkey("'", 1, undefined, '"', "→"), fkey("Return", 2.25, "legend-center-left", undefined, "Enter")],
       [key("Shift", 2.25, "legend-center-left"), ..."ZXCVBNM".split("").map((label) => key(label, 1)), fkey(",", 1, undefined, "<", "End"), fkey(".", 1, undefined, ">", "↓"), key("/", 1, undefined, "?"), key("Shift", 1.75, "legend-center-left"), key("Fn", 1, "legend-center-left")],
-      [key("Alt", 1.25, "legend-modifier-stack", "Opt"), icon("diamond", "◇", 1.25, "legend-center"), [blankLegend, 6, "space"], icon("diamond", "◇", 1.25, "legend-center"), key("Alt", 1.25, "legend-modifier-stack", "Opt")],
+      [key("Alt", 1, "legend-modifier-stack", "Opt"), icon("diamond", "◇", 1.5, "legend-center"), [blankLegend, 6, "space"], icon("diamond", "◇", 1.5, "legend-center"), key("Alt", 1, "legend-modifier-stack", "Opt")],
     ],
   },
   jis: {

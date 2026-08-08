@@ -40,9 +40,18 @@ describe("keyboard catalog", () => {
   it("matches the official US modifier placement", () => {
     const shiftRowLabels = layouts.us.rows[3].map(([legend]) => legend.accessibleLabel ?? legend.primary);
     const bottomRowLabels = layouts.us.rows[4].map(([legend]) => legend.accessibleLabel ?? legend.primary);
+    const bottomRowWidths = layouts.us.rows[4].map(([, width]) => width);
 
     expect(shiftRowLabels).toEqual(["Shift", "Z", "X", "C", "V", "B", "N", "M", ",", ".", "/", "Shift", "Fn"]);
     expect(bottomRowLabels).toEqual(["Alt", "◇", "スペース", "◇", "Alt"]);
+    expect(bottomRowWidths).toEqual([1, 1.5, 6, 1.5, 1]);
+  });
+
+  it("keeps row unit widths aligned to the HHKB key grid", () => {
+    const rowWidths = (layoutName: LayoutName) => layouts[layoutName].rows.map((row) => row.reduce((total, [, width]) => total + width, 0));
+
+    expect(rowWidths("us")).toEqual([15, 15, 15, 15, 11]);
+    expect(rowWidths("jis")).toEqual([15, 15, 13.75, 15, 15]);
   });
 });
 
