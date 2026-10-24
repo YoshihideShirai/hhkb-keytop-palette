@@ -39,3 +39,10 @@ export function defaultProductForSeries(
     ) ?? productAppearances.find((product) => product.series === series)
   );
 }
+
+export function supportsLayout(
+  product: ProductAppearance,
+  layout: LayoutName,
+): boolean {
+  return !product.supportedLayouts || product.supportedLayouts.includes(layout);
+}

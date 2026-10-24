@@ -13,6 +13,7 @@ import {
   isLayoutName,
   isProductId,
   productsForSeries,
+  supportsLayout,
 } from "./product-helpers";
 import { productAppearances } from "./products";
 import {
@@ -70,6 +71,32 @@ describe("design URL codec", () => {
       layout: "jis",
       product: "classic-type-s-snow",
       colors,
+    });
+  });
+
+  it("preserves existing model indexes and round-trips every Elite variant", () => {
+    const originalIds = [
+      "hybrid-type-s-sumi",
+      "hybrid-type-s-white",
+      "hybrid-type-s-snow",
+      "hybrid-sumi",
+      "hybrid-white",
+      "classic-type-s-sumi",
+      "classic-type-s-white",
+      "classic-type-s-snow",
+      "classic-sumi",
+      "classic-white",
+      "studio-sumi",
+      "studio-snow",
+    ];
+    expect(
+      productAppearances.slice(0, originalIds.length).map(({ id }) => id),
+    ).toEqual(originalIds);
+    const colors = colorsForLayout("us");
+    productsForSeries("Professional Elite").forEach(({ id }) => {
+      expect(
+        deserializeDesignParam(serializeDesignParam(colors, "us", id)),
+      ).toEqual({ layout: "us", product: id, colors });
     });
   });
 
@@ -177,6 +204,24 @@ describe("catalog helper boundaries", () => {
       "hybrid-type-s-white",
     );
     expect(defaultProductForSeries("Studio")?.series).toBe("Studio");
+  });
+
+  it("offers all six Elite appearances only in the official US layout", () => {
+    const elite = productsForSeries("Professional Elite");
+    expect(elite).toHaveLength(6);
+    expect(new Set(elite.map(({ colorValue }) => colorValue)).size).toBe(1);
+    for (const color of ["白", "墨", "雪"]) {
+      const variants = elite.filter(({ colorName }) => colorName === color);
+      expect(variants.map(({ legendVariant }) => legendVariant)).toEqual([
+        "anniversary-center",
+        "blank",
+      ]);
+    }
+    elite.forEach((product) => {
+      expect(supportsLayout(product, "us")).toBe(true);
+      expect(supportsLayout(product, "jis")).toBe(false);
+    });
+    expect(supportsLayout(productAppearances[0], "jis")).toBe(true);
   });
 
   it("keeps body color choices ordered for scanning in the UI", () => {

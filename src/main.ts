@@ -20,6 +20,7 @@ import {
   isLayoutName,
   isProductId,
   productsForSeries,
+  supportsLayout,
 } from "./product-helpers";
 import { productAppearances, productSeries } from "./products";
 import {
@@ -204,6 +205,13 @@ function renderLayoutControls(): void {
       const active = button.dataset.layout === currentLayout;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
+      button.disabled = !supportsLayout(
+        currentProductAppearance(),
+        button.dataset.layout as LayoutName,
+      );
+      button.title = button.disabled
+        ? "Professional Eliteは英語配列のみです"
+        : "";
     });
 }
 
@@ -222,6 +230,13 @@ function applyStoredDesign(stored: SavedState | string[] | null): boolean {
       (Array.isArray(stored.colors) ? { [nextLayout]: stored.colors } : {});
   } else {
     return false;
+  }
+
+  const nextAppearance = productAppearances.find(
+    ({ id }) => id === nextProduct,
+  );
+  if (nextAppearance && !supportsLayout(nextAppearance, nextLayout)) {
+    nextLayout = "us";
   }
 
   const values = nextSavedDesigns[nextLayout];
@@ -326,6 +341,12 @@ function selectProduct(
   if (!isProductId(product)) return;
 
   currentProduct = product;
+  if (!supportsLayout(currentProductAppearance(), currentLayout)) {
+    savedDesigns[currentLayout] = keyColors;
+    currentLayout = "us";
+    keyColors = savedDesigns.us ?? defaultColors();
+  }
+  renderLayoutControls();
   if (applyFactoryColors) {
     keyColors = defaultColors();
   }
@@ -353,6 +374,14 @@ function selectSeries(series: ProductSeries): void {
 
 function renderAppearanceControls(): void {
   const current = currentProductAppearance();
+  const isElite = current.caseStyle === "elite";
+  const colorTitle = document.querySelector(".body-color-title h2");
+  if (colorTitle)
+    colorTitle.textContent = isElite ? "キートップ仕様" : "本体色";
+  bodyColors.setAttribute(
+    "aria-label",
+    isElite ? "HHKBキートップ仕様" : "HHKB本体色",
+  );
 
   document
     .querySelectorAll<HTMLButtonElement>(".model-button")
@@ -369,7 +398,7 @@ function renderAppearanceControls(): void {
     button.className = "body-color";
     button.dataset.product = product.id;
     button.setAttribute("aria-pressed", String(product.id === currentProduct));
-    button.innerHTML = `<span class="body-color-swatch" style="--color:${product.colorValue}"></span><span>${product.colorName}</span>`;
+    button.innerHTML = `<span class="body-color-swatch" style="--color:${isElite ? product.keyColor : product.colorValue}"></span><span>${product.colorName}${product.legendVariant === "blank" ? "（無刻印）" : ""}</span>`;
     button.classList.toggle("active", product.id === currentProduct);
     button.addEventListener("click", () =>
       selectProduct(product.id, true, true),
@@ -391,7 +420,12 @@ function renderAppearanceControls(): void {
 }
 
 function selectLayout(layout: string | undefined): void {
-  if (!isLayoutName(layout) || layout === currentLayout) return;
+  if (
+    !isLayoutName(layout) ||
+    layout === currentLayout ||
+    !supportsLayout(currentProductAppearance(), layout)
+  )
+    return;
 
   savedDesigns[currentLayout] = keyColors;
   currentLayout = layout;
@@ -438,6 +472,10 @@ function downloadPresetFile(): void {
 function applyUploadedPreset(preset: FixedPresetDefinition): void {
   savedDesigns[currentLayout] = keyColors;
   currentLayout = preset.layout;
+  if (!supportsLayout(currentProductAppearance(), currentLayout)) {
+    currentProduct = defaultProduct;
+    renderAppearanceControls();
+  }
 
   keyColors = preset.rows.flatMap((row) => row.colors);
   savedDesigns[currentLayout] = keyColors;
