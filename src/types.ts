@@ -30,7 +30,8 @@ export type ProductSeries =
   | "HYBRID"
   | "Classic Type-S"
   | "Classic"
-  | "Studio";
+  | "Studio"
+  | "Professional Elite";
 export type ProductId =
   | "hybrid-type-s-sumi"
   | "hybrid-type-s-white"
@@ -43,7 +44,13 @@ export type ProductId =
   | "classic-sumi"
   | "classic-white"
   | "studio-sumi"
-  | "studio-snow";
+  | "studio-snow"
+  | "elite-sumi"
+  | "elite-white"
+  | "elite-snow"
+  | "elite-sumi-blank"
+  | "elite-white-blank"
+  | "elite-snow-blank";
 
 export interface ColorOption {
   name: string;
@@ -80,7 +87,8 @@ export interface ProductAppearance {
   legendColor: string;
   legendVariant: LegendVariant;
   legendContrast: "standard" | "low";
-  caseStyle: "classic" | "hybrid" | "studio";
+  caseStyle: "classic" | "hybrid" | "studio" | "elite";
+  supportedLayouts?: readonly LayoutName[];
   detail: string;
 }
 
@@ -89,6 +97,7 @@ export const legendVariants = [
   "snow-center",
   "anniversary-center",
   "studio-center",
+  "blank",
 ] as const;
 export type LegendVariant = (typeof legendVariants)[number];
 

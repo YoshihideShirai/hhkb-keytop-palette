@@ -15,6 +15,7 @@ https://yoshihideshirai.github.io/hhkb-keytop-palette/
 ## 主な機能
 
 - HHKBのモデル・本体色を選んで、実機に近い雰囲気で配色を確認
+  - [Professional Elite](https://happyhackingkb.com/jp/products/elite/)：白・墨・雪の刻印／無刻印、英語配列に対応
 - 英語配列 / 日本語配列を切り替えて、キーごとの見え方を比較
 - パレットカラーやカスタムカラーを選び、クリック / タップでキー単位に着色
 - アクセント、グラデーション、役割別の色分けなどをプリセットからワンタップ適用
